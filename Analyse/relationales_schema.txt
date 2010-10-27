@@ -1,0 +1,11 @@
+Relationales Schema
+
+Entities:
+
+Partei:{[ParteiName:string]} key:ParteiName
+Kandidat:{[AusweisNr:char[10], Vorname:string, Nachname:string, Geburtsdatum:date, Strasse:string, Hausnummer:string, Postleitzahl:char[6], Stadt:string]} key:PersoNr
+Wahlkreis:{[WahlkreisNr:integer, WahlkreisName:string]} key:WahlkreisNr
+Wahlbezirk:{[WahlbezirkNummer:integer, WahlbezirkName:string, Wahlvorstand:string, Strasse:string, Hausnummer:string, Postleitzahl:char[6], Stadt:string]} key:WahlkreisNr
+Bundesland:{[Kuerzel:char[2], BundeslandName:string, Hauptstadt:string]} key:Kuerzel
+Wahlberechtigte:{[AusweisNr:char[10], Vorname:string, Nachname:string, Geburtsdatum:date, Strasse:string, Hausnummer:string, Postleitzahl:char[6], Stadt:string]} key:AusweisNr
+Wahlzettel:{[]} key:
