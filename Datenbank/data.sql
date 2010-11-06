@@ -32,11 +32,12 @@ CREATE TABLE Wahlkreis (
 -- Enthält Beziehung "WB liegt in"
 CREATE TABLE Wahlbezirk (
 	nummer serial primary key,
-	wahlvorstand varchar(50),
-	strasse varchar(50),
-	hausnummer integer,
-	postleitzahl integer,
-	stadt varchar,
+	name varchar(50),
+	--wahlvorstand varchar(50),
+	--strasse varchar(50),
+	--hausnummer integer,
+	--postleitzahl integer,
+	--stadt varchar,
 	wahlkreis integer REFERENCES Wahlkreis
 );
 
