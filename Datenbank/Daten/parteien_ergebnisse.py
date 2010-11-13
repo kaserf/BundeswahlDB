@@ -7,26 +7,52 @@ import codecs
 parteien = []
 parteienmap = {}
 wahlzettel = []
+kandidaten = []
 
 # read Parteien
 csvfile = open("Parteien.csv", "r")
 dialect = csv.Sniffer().sniff(csvfile.read(1024))
+dialect.delimiter = ';'
 csvfile.seek(0)
 reader = csv.reader(csvfile, dialect)
 # ignore headline
 reader.next()
 
 for row in reader:
-    name = row[0].decode('iso8859_15')
-    nummer = row[2].decode('iso8859_15').split(',')[0]
-    parteienmap[nummer] = name
-    parteien.append('INSERT INTO Partei VALUES ("%s");' % name)
+    p_kurz = row[0].decode('iso8859_3')
+    p_name = row[1].decode('iso8859_3')
+    p_nummer = int(row[2].decode('iso8859_3'))
+    parteienmap[p_nummer] = p_name
+    parteien.append('INSERT INTO Partei VALUES (%i, "%s", "%s");' % (p_nummer, p_kurz, p_name))
 
 datafile = codecs.open('parteien.sql', 'w', 'utf-8')
 datafile.write(u'--Parteien einfügen\n')
 datafile.write('\n'.join(parteien))
 datafile.close()
 
+# read Kandidaten
+csvfile = open("Kandidaten.csv", "r")
+dialect = csv.Sniffer().sniff(csvfile.read(1024))
+dialect.delimiter = ';'
+csvfile.seek(0)
+reader = csv.reader(csvfile, dialect)
+# ignore headline
+reader.next()
+
+for row in reader:
+#    k_id = int(row[0].decode('iso8859_15'))
+    k_vorname = row[1].decode('iso8859_3')
+    k_nachname = row[0].decode('iso8859_3')
+    k_geburtsjahr = row[2].decode('iso8859_3')
+    k_partei = int(row[4].decode('iso8859_3'))
+    kandidaten.append('INSERT INTO Kandidat VALUES ("%s", "%s", "%s", %i);' % (k_vorname, k_nachname, k_geburtsjahr, k_partei))
+
+datafile = codecs.open('kandidat.sql', 'w', 'utf-8')
+datafile.write(u'--Kandidaten einfügen\n')
+datafile.write('\n'.join(kandidaten))
+datafile.close()
+
+"""
 # read Wahlergebnisse
 csvfile = open("Wahlkreis_Ergebnisse.csv", "r")
 dialect = csv.Sniffer().sniff(csvfile.read(1024))
@@ -71,3 +97,4 @@ for (year,wahlkreis_map) in wahlzettel_map.iteritems():
             print ('Unterschiedlich viele Erst- und Zweitstimmen in WK %s im jahr %s: %d,%d' % (wahlkreis, year, len(wahlkreis_erststimmen), len(wahlkreis_zweitstimmen)))
 
 wahlzettel_file.close()
+"""

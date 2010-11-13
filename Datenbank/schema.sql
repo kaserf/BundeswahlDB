@@ -3,17 +3,21 @@ DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
 CREATE TABLE Partei (
-	name varchar(50) primary key
+	nummer serial primary key,
+	kurzbezeichnung varchar(50),
+	name varchar(100)
 );
 
 CREATE TABLE Kandidat (
 	ausweisnummer integer primary key,
 	vorname varchar(50),
 	nachname varchar(50),
-	strasse varchar(50),
-	hausnummer integer,
-	postleitzahl integer,
-	stadt varchar(50)
+	geburtsjahr varchar(4),
+	partei integer REFERENCES Partei
+	--strasse varchar(50),
+	--hausnummer integer,
+	--postleitzahl integer,
+	--stadt varchar(50)
 );
 
 CREATE TABLE Bundesland (
@@ -44,7 +48,7 @@ CREATE TABLE Wahlbezirk (
 -- Enthält Beziehung "gehört zu", "aufgestellt für"
 CREATE TABLE Landesliste (
 	id serial primary key,
-	partei varchar(50) REFERENCES Partei,
+	partei integer REFERENCES Partei,
 	bundesland varchar(10) REFERENCES Bundesland,
 	unique (partei, bundesland)
 );
@@ -89,7 +93,7 @@ CREATE TABLE Listenergebnis (
 CREATE TABLE Wahlzettel (
 	id serial primary key,
 	erststimme integer REFERENCES Kandidat,
-	zweitstimme varchar(50) REFERENCES Partei,
+	zweitstimme integer REFERENCES Partei,
 	wahlbezirk integer REFERENCES Wahlbezirk
 );
 

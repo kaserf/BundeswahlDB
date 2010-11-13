@@ -1,42 +1,31 @@
-Kurzbezeichnung;Name;Nr
-Volksabst;Ab jetzt...Bündnis für Deutschland, für Demokratie durch Volksabstimmung ;1,00
-ADM;Allianz der Mitte ;2,00
-BP;Bayernpartei ;3,00
-GRÜNE;BÜNDNIS 90/DIE GRÜNEN ;4,00
-BüSo;Bürgerrechtsbewegung Solidarität ;5,00
-CDU;Christlich Demokratische Union Deutschlands ;6,00
-CM;CHRISTLICHE MITTE - Für ein Deutschland nach GOTTES Geboten ;7,00
-CSU;Christlich-Soziale Union in Bayern e.V. ;8,00
-DKP;Deutsche Kommunistische Partei ;10,00
-DVU;DEUTSCHE VOLKSUNION ;11,00
-ZENTRUM;Deutsche Zentrumspartei - Älteste Partei Deutschlands gegründet 1870 ;12,00
-DIE LINKE;DIE LINKE ;13,00
-REP;DIE REPUBLIKANER ;14,00
-VIOLETTEN;Die Violetten;15,00
-FAMILIE;Familien-Partei Deutschlands ;16,00
-FDP;Freie Demokratische Partei ;17,00
-Freie Union;Freie Union ;18,00
-FWD;Freie Wähler Deutschland ;19,00
-MLPD;Marxistisch-Leninistische Partei Deutschlands ;20,00
-Tierschutz;Mensch Umwelt Tierschutz ;21,00
-NPD;Nationaldemokratische Partei Deutschlands ;22,00
-ödp;Ökologisch-Demokratische Partei ;23,00
-PBC;Partei Bibeltreuer Christen ;24,00
-PSG;Partei für Soziale Gleichheit, Sektion der Vierten Internationale ;25,00
-PIRATEN;Piratenpartei Deutschland  ;26,00
-RRP;Rentnerinnen und Rentner Partei ;27,00
-RENTNER;Rentner-Partei-Deutschland ;28,00
-SPD;Sozialdemokratische Partei Deutschlands ;29,00
-GRAUE;;30,00
-DIE FRAUEN;;31,00
-AGFG;;32,00
-APPD;;33,00
-50Plus;;34,00
-Die PARTEI;;35,00
-Pro DM;;36,00
-DSU;;37,00
-HP;;38,00
-HUMANWIRTSCHAFTS- PARTEI;;39,00
-STATT Partei;;40,00
-UNABHÄNGIGE;;41,00
-Parteilose;;99,00
+'Kurzbezeichnung';'Name  ';'Nr.'
+'Volksabst.';'Ab jetzt...Bündnis für Deutschland, für Demokratie durch Volksabstimmung ';1
+'ADM';'Allianz der Mitte ';2
+'BP';'Bayernpartei ';3
+'GRÜNE';'BÜNDNIS 90/DIE GRÜNEN ';4
+'BüSo';'Bürgerrechtsbewegung Solidarität ';5
+'CDU';'Christlich Demokratische Union Deutschlands ';6
+'CM';'CHRISTLICHE MITTE - Für ein Deutschland nach GOTTES Geboten ';7
+'CSU';'Christlich-Soziale Union in Bayern e.V. ';8
+'DVD';'Demokratische Volkspartei Deutschland ';9
+'DKP';'Deutsche Kommunistische Partei ';10
+'DVU';'DEUTSCHE VOLKSUNION ';11
+'ZENTRUM';'Deutsche Zentrumspartei - Älteste Partei Deutschlands gegründet 1870 ';12
+'DIE LINKE';'DIE LINKE ';13
+'REP';'DIE REPUBLIKANER ';14
+'VIOLETTEN';'Die Violetten';15
+'FAMILIE';'Familien-Partei Deutschlands ';16
+'FDP';'Freie Demokratische Partei ';17
+'Freie Union';'Freie Union ';18
+'FWD';'Freie Wähler Deutschland ';19
+'MLPD';'Marxistisch-Leninistische Partei Deutschlands ';20
+'Tierschutz';'Mensch Umwelt Tierschutz ';21
+'NPD';'Nationaldemokratische Partei Deutschlands ';22
+'ödp';'Ökologisch-Demokratische Partei ';23
+'PBC';'Partei Bibeltreuer Christen ';24
+'PSG';'Partei für Soziale Gleichheit, Sektion der Vierten Internationale ';25
+'PIRATEN';'Piratenpartei Deutschland  ';26
+'RRP';'Rentnerinnen und Rentner Partei ';27
+'RENTNER';'Rentner-Partei-Deutschland ';28
+'SPD';'Sozialdemokratische Partei Deutschlands ';29
+'Parteilose';'Parteilose';30
