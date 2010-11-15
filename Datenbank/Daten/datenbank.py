@@ -1,9 +1,10 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import csv
 
 def OpenCSV(name, skipfirst=True):
-    csvfile = open(name, "r")
+    csvfile = open(name, 'r')
     dialect = csv.Sniffer().sniff(csvfile.read(1024))
     dialect.delimiter = ','
     csvfile.seek(0)
@@ -27,60 +28,84 @@ wahlkreise = OpenCSV('Wahlbewerber_2009_Wahlkreise.csv')
 ergebnisse = OpenCSV('Wahlkreis_Ergebnisse.csv')
 
 Partei = [] #
-Kandidat = []
+Kandidat = [] #
 Bundesland = [] #
 Wahlkreis = [] #
 Wahlbezirk = [] #
-Landesliste = []
+Landesliste = [] #
 Wahlberechtigte = []
 Wahlergebnis = []
 Direktergebnis = []
 Listenergebnis = []
 Wahlzettel = []
-Landesliste_Kandidat = []
-Kandidat_Wahlkreis = []
+Landesliste_Kandidat = [] #
+Kandidat_Wahlkreis = [] #
 
 # Laender einlesen
 for (nummer, name, kurz) in laender:
-    Bundesland.append('INSERT INTO Bundesland VALUES(%s, "%s", "%s");' % (nummer, kurz, name))
+    Bundesland.append("INSERT INTO Bundesland VALUES(%s, '%s', '%s');" % (nummer, kurz, name))
 
-WriteSQL('bundesland', Bundesland)
+WriteSQL("bundesland", Bundesland)
 
 # Parteien einlesen
 for (kurz, name, nummer) in parteien:
-    Partei.append('INSERT INTO Partei VALUES(%s,"%s","%s");' % (nummer, kurz, name))
+    Partei.append("INSERT INTO Partei VALUES(%s,'%s','%s');" % (nummer, kurz, name))
 
 # Dummypartei für Parteilose einfügen
-Partei.append('INSERT INTO Partei VALUES(99, "pl", "parteilos");')
+Partei.append("INSERT INTO Partei VALUES(99, 'pl', 'parteilos');")
 
-WriteSQL('partei', Partei)
+WriteSQL("partei", Partei)
 
 # Wahlkreise einlesen
 wahlkreis_nummern = []
 for (nummer, name, bundeslandnr) in wahlkreise:
     nummer = int(nummer)
     wahlkreis_nummern.append(nummer)
-    Wahlkreis.append('INSERT INTO Wahlkreis VALUES(%d, "%s", %s)' % (nummer, name, bundeslandnr))
+    Wahlkreis.append("INSERT INTO Wahlkreis VALUES(%d, '%s', %s);" % (nummer, name, bundeslandnr))
 
-WriteSQL('wahlkreis', Wahlkreis)
+WriteSQL("wahlkreis", Wahlkreis)
 
 num_wbs = 20
 
 # Wahlbezirke erfinden
 for wk_nummer in wahlkreis_nummern:
     for wb_nummer in range(0,num_wbs):
-        Wahlbezirk.append('INSERT INTO Wahlbezirk VALUES(%d,%d)' % (wb_nummer, wk_nummer))
+        Wahlbezirk.append("INSERT INTO Wahlbezirk(nummer,wahlkreis) VALUES(%d,%d);" % (wb_nummer, wk_nummer))
 
-WriteSQL('wahlbezirk', Wahlbezirk)
+WriteSQL("wahlbezirk", Wahlbezirk)
 
 # Kandidaten, Landeslisten und Direktkandidaten
+kandidatnr = 0
 landeslisten = {}
+landeslistennr = 0
 
-for (vorname, nachname, geburtsjahr, partei, parteinr, land, landnr, platz, wknr) in kandidaten:
-    if partei.startswith('K:'):
+for (nachname, vorname, geburtsjahr, partei, parteinr, land, landnr, platz, wknr) in kandidaten:
+    if parteinr.isalnum():
+        parteinr = int(parteinr)
+    if partei.startswith("K:"):
         parteinr = 99
-    Kandidat.append('INSERT INTO Kandidat VALUES("%s", "%s", %s, %s)' % (vorname, nachname, geburtsjahr, parteinr))
+    Kandidat.append("INSERT INTO Kandidat VALUES(%d, '%s', '%s', %s, %d);" % (kandidatnr, vorname, nachname, geburtsjahr, parteinr))
     
     # Listenkandidatur
-#    if len(land) != 0:
-#        if 
+    if landnr.isalnum():
+        landnr = int(landnr)
+        llnr = landeslistennr
+        if not (parteinr, landnr) in landeslisten:
+            landeslisten[(parteinr, landnr)] = landeslistennr
+            Landesliste.append("INSERT INTO Landesliste VALUES(%d, %d, %d);" % (landeslistennr, parteinr, landnr))
+            landeslistennr += 1
+        else:
+            llnr = landeslisten[(parteinr, landnr)]
+        platz = int(platz)
+        Landesliste_Kandidat.append("INSERT INTO Landesliste_Kandidat VALUES(%d, %d, %d);" % (llnr, kandidatnr, platz))
+        
+    # Wahlkreiskandidatur
+    if wknr.isalnum():
+        wknr = int(wknr)
+        Kandidat_Wahlkreis.append("INSERT INTO Kandidat_Wahlkreis VALUES(%d, %d);" % (kandidatnr, wknr))
+    kandidatnr += 1
+
+WriteSQL("kandidat", Kandidat)
+WriteSQL("landesliste", Landesliste)
+WriteSQL("landesliste_kandidat", Landesliste_Kandidat)
+WriteSQL("kandidat_wahlkreis", Kandidat_Wahlkreis)

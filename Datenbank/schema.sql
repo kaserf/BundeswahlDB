@@ -9,7 +9,7 @@ CREATE TABLE Partei (
 );
 
 CREATE TABLE Kandidat (
-	ausweisnummer serial primary key,
+	ausweisnummer integer primary key,
 	vorname varchar(50),
 	nachname varchar(50),
 	geburtsjahr varchar(4),
@@ -29,27 +29,28 @@ CREATE TABLE Bundesland (
 -- Enthält Beziehung "WK liegt in"
 CREATE TABLE Wahlkreis (
 	nummer integer primary key,
-	name varchar(50),
+	name varchar(100),
 	bundesland integer REFERENCES Bundesland
 );
 
 -- Enthält Beziehung "WB liegt in"
 CREATE TABLE Wahlbezirk (
-	nummer integer primary key,
+	id serial primary key,
+	nummer integer,
 	--name varchar(50),
 	--wahlvorstand varchar(50),
 	--strasse varchar(50),
 	--hausnummer integer,
 	--postleitzahl integer,
 	--stadt varchar,
-	wahlkreis integer REFERENCES Wahlkreis
+	wahlkreis integer REFERENCES Wahlkreis,
+	unique (nummer, wahlkreis)
 );
-
 -- Enthält Beziehung "gehört zu", "aufgestellt für"
 CREATE TABLE Landesliste (
-	id serial primary key,
+	id integer primary key,
 	partei integer REFERENCES Partei,
-	bundesland varchar(10) REFERENCES Bundesland,
+	bundesland integer REFERENCES Bundesland,
 	unique (partei, bundesland)
 );
 
