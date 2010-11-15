@@ -1,4 +1,6 @@
-Budnestagswahl Datenbank für die Vorlesung Datenbanksysteme
+Bundestagswahl Datenbank für die Vorlesung Datenbanksysteme
 
 == Dateien ==
-in "Analyse" finden sich die Anforderungsanalyse und das ER Diagramm
+in "Analyse" befinden sich die Anforderungsanalyse und das ER Diagramm
+in "Abgaben" befinden sich die abgegebenen Dokumente
+in "Datenbank" befindet sich das SQL-Schema, Auswertungsalgorithmen sowie Code zum Befüllen der Datenbank mit Daten

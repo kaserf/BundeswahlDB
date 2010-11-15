@@ -9,7 +9,7 @@ CREATE TABLE Partei (
 );
 
 CREATE TABLE Kandidat (
-	ausweisnummer serial primary key,
+	ausweisnummer integer primary key,
 	vorname varchar(50),
 	nachname varchar(50),
 	geburtsjahr varchar(4),
@@ -55,7 +55,7 @@ CREATE TABLE Landesliste (
 
 -- Enthält Beziehung "wählt in"
 CREATE TABLE Wahlberechtigte (
-	ausweisnummer serial primary key,
+	ausweisnummer integer primary key,
 	vorname varchar(50),
 	nachname varchar(50),
 	geburtsdatum varchar(10),
