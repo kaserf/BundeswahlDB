@@ -1,0 +1,300 @@
+"wahlkreisnr.","Name","bundesland-nr."
+"001","Flensburg - Schleswig",15
+"002","Nordfriesland - Dithmarschen Nord",15
+"003","Steinburg - Dithmarschen Süd",15
+"004","Rendsburg-Eckernförde",15
+"005","Kiel",15
+"006","Plön - Neumünster",15
+"007","Pinneberg",15
+"008","Segeberg - Stormarn-Nord",15
+"009","Ostholstein",15
+"010","Herzogtum Lauenburg - Stormarn-Süd",15
+"011","Lübeck",15
+"012","Wismar - Nordwestmecklenburg - Parchim",8
+"013","Schwerin - Ludwigslust",8
+"014","Rostock",8
+"015","Stralsund - Nordvorpommern - Rügen",8
+"016","Greifswald - Demmin - Ostvorpommern",8
+"017","Bad Doberan - Güstrow - Müritz",8
+"018","Neubrandenburg - Mecklenburg-Strelitz - Uecker-Randow",8
+"019","Hamburg-Mitte",6
+"020","Hamburg-Altona",6
+"021","Hamburg-Eimsbüttel",6
+"022","Hamburg-Nord",6
+"023","Hamburg-Wandsbek",6
+"024","Hamburg-Bergedorf - Harburg",6
+"025","Aurich - Emden",9
+"026","Unterems",9
+"027","Friesland - Wilhelmshaven",9
+"028","Oldenburg - Ammerland",9
+"029","Delmenhorst - Wesermarsch - Oldenburg-Land",9
+"030","Cuxhaven - Stade II",9
+"031","Stade I - Rotenburg II",9
+"032","Mittelems",9
+"033","Cloppenburg - Vechta",9
+"034","Diepholz - Nienburg I",9
+"035","Osterholz - Verden",9
+"036","Rotenburg I - Soltau-Fallingbostel",9
+"037","Harburg",9
+"038","Lüchow-Dannenberg - Lüneburg",9
+"039","Osnabrück-Land",9
+"040","Stadt Osnabrück",9
+"041","Nienburg II - Schaumburg",9
+"042","Stadt Hannover I",9
+"043","Stadt Hannover II",9
+"044","Hannover-Land I",9
+"045","Celle - Uelzen",9
+"046","Gifhorn - Peine",9
+"047","Hameln-Pyrmont - Holzminden",9
+"048","Hannover-Land II",9
+"049","Hildesheim",9
+"050","Salzgitter - Wolfenbüttel",9
+"051","Braunschweig",9
+"052","Helmstedt - Wolfsburg",9
+"053","Goslar - Northeim - Osterode",9
+"054","Göttingen",9
+"055","Bremen I",5
+"056","Bremen II - Bremerhaven",5
+"057","Prignitz - Ostprignitz-Ruppin - Havelland I",4
+"058","Uckermark - Barnim I",4
+"059","Oberhavel - Havelland II",4
+"060","Märkisch-Oderland - Barnim II",4
+"061","Brandenburg an der Havel - Potsdam-Mittelmark I - Havelland III - Teltow-Fläming I",4
+"062","Potsdam - Potsdam-Mittelmark II - Teltow-Fläming II",4
+"063","Dahme-Spreewald - Teltow-Fläming III - Oberspreewald-Lausitz I",4
+"064","Frankfurt (Oder) - Oder-Spree",4
+"065","Cottbus - Spree-Neiße",4
+"066","Elbe-Elster - Oberspreewald-Lausitz II",4
+"067","Altmark",14
+"068","Börde - Jerichower Land",14
+"069","Harz",14
+"070","Magdeburg",14
+"071","Dessau - Wittenberg",14
+"072","Anhalt",14
+"073","Halle",14
+"074","Burgenland - Saalekreis",14
+"075","Mansfeld",14
+"076","Berlin-Mitte",3
+"077","Berlin-Pankow",3
+"078","Berlin-Reinickendorf",3
+"079","Berlin-Spandau - Charlottenburg Nord",3
+"080","Berlin-Steglitz - Zehlendorf",3
+"081","Berlin-Charlottenburg - Wilmersdorf",3
+"082","Berlin-Tempelhof - Schöneberg",3
+"083","Berlin-Neukölln",3
+"084","Berlin-Friedrichshain - Kreuzberg - Prenzlauer Berg Ost",3
+"085","Berlin-Treptow - Köpenick",3
+"086","Berlin-Marzahn - Hellersdorf",3
+"087","Berlin-Lichtenberg",3
+"088","Aachen",10
+"089","Kreis Aachen",10
+"090","Heinsberg",10
+"091","Düren",10
+"092","Erftkreis I",10
+"093","Euskirchen - Erftkreis II",10
+"094","Köln I",10
+"095","Köln II",10
+"096","Köln III",10
+"097","Bonn",10
+"098","Rhein-Sieg-Kreis I",10
+"099","Rhein-Sieg-Kreis II",10
+"100","Oberbergischer Kreis",10
+"101","Rheinisch-Bergischer Kreis",10
+"102","Leverkusen - Köln IV",10
+"103","Wuppertal I",10
+"104","Solingen - Remscheid - Wuppertal II",10
+"105","Mettmann I",10
+"106","Mettmann II",10
+"107","Düsseldorf I",10
+"108","Düsseldorf II",10
+"109","Neuss I",10
+"110","Mönchengladbach",10
+"111","Krefeld I - Neuss II",10
+"112","Viersen",10
+"113","Kleve",10
+"114","Wesel I",10
+"115","Krefeld II - Wesel II",10
+"116","Duisburg I",10
+"117","Duisburg II",10
+"118","Oberhausen - Wesel III",10
+"119","Mülheim - Essen I",10
+"120","Essen II",10
+"121","Essen III",10
+"122","Recklinghausen I",10
+"123","Recklinghausen II",10
+"124","Gelsenkirchen",10
+"125","Steinfurt I - Borken I",10
+"126","Bottrop - Recklinghausen III",10
+"127","Borken II",10
+"128","Coesfeld - Steinfurt II",10
+"129","Steinfurt III",10
+"130","Münster",10
+"131","Warendorf",10
+"132","Gütersloh",10
+"133","Bielefeld",10
+"134","Herford - Minden-Lübbecke II",10
+"135","Minden-Lübbecke I",10
+"136","Lippe I",10
+"137","Höxter - Lippe II",10
+"138","Paderborn",10
+"139","Hagen - Ennepe-Ruhr-Kreis I",10
+"140","Ennepe-Ruhr-Kreis II",10
+"141","Bochum I",10
+"142","Herne - Bochum II",10
+"143","Dortmund I",10
+"144","Dortmund II",10
+"145","Unna I",10
+"146","Hamm - Unna II",10
+"147","Soest",10
+"148","Hochsauerlandkreis",10
+"149","Siegen-Wittgenstein",10
+"150","Olpe - Märkischer Kreis I",10
+"151","Märkischer Kreis II",10
+"152","Nordsachsen",13
+"153","Leipzig I",13
+"154","Leipzig II",13
+"155","Leipzig-Land",13
+"156","Meißen",13
+"157","Bautzen I",13
+"158","Görlitz",13
+"159","Sächsische Schweiz - Osterzgebirge",13
+"160","Dresden I",13
+"161","Dresden II - Bautzen II",13
+"162","Mittelsachsen",13
+"163","Chemnitz",13
+"164","Chemnitzer Umland - Erzgebirgskreis II",13
+"165","Erzgebirgskreis I",13
+"166","Zwickau",13
+"167","Vogtlandkreis",13
+"168","Waldeck",7
+"169","Kassel",7
+"170","Werra-Meißner - Hersfeld-Rotenburg",7
+"171","Schwalm-Eder",7
+"172","Marburg",7
+"173","Lahn-Dill",7
+"174","Gießen",7
+"175","Fulda",7
+"176","Hochtaunus",7
+"177","Wetterau",7
+"178","Rheingau-Taunus - Limburg",7
+"179","Wiesbaden",7
+"180","Hanau",7
+"181","Main-Taunus",7
+"182","Frankfurt am Main I",7
+"183","Frankfurt am Main II",7
+"184","Groß-Gerau",7
+"185","Offenbach",7
+"186","Darmstadt",7
+"187","Odenwald",7
+"188","Bergstraße",7
+"189","Eichsfeld - Nordhausen - Unstrut-Hainich-Kreis I",16
+"190","Eisenach - Wartburgkreis - Unstrut-Hainich-Kreis II",16
+"191","Kyffhäuserkreis - Sömmerda - Weimarer Land I",16
+"192","Gotha - Ilm-Kreis",16
+"193","Erfurt - Weimar - Weimarer Land II",16
+"194","Gera - Jena - Saale-Holzland-Kreis",16
+"195","Greiz - Altenburger Land",16
+"196","Sonneberg - Saalfeld-Rudolstadt - Saale-Orla-Kreis",16
+"197","Suhl - Schmalkalden-Meiningen - Hildburghausen",16
+"198","Neuwied",11
+"199","Ahrweiler",11
+"200","Koblenz",11
+"201","Mosel/Rhein-Hunsrück",11
+"202","Kreuznach",11
+"203","Bitburg",11
+"204","Trier",11
+"205","Montabaur",11
+"206","Mainz",11
+"207","Worms",11
+"208","Ludwigshafen/Frankenthal",11
+"209","Neustadt - Speyer",11
+"210","Kaiserslautern",11
+"211","Pirmasens",11
+"212","Südpfalz",11
+"213","Altötting",2
+"214","Erding - Ebersberg",2
+"215","Freising",2
+"216","Fürstenfeldbruck",2
+"217","Ingolstadt",2
+"218","München-Nord",2
+"219","München-Ost",2
+"220","München-Süd",2
+"221","München-West/Mitte",2
+"222","München-Land",2
+"223","Rosenheim",2
+"224","Starnberg",2
+"225","Traunstein",2
+"226","Weilheim",2
+"227","Deggendorf",2
+"228","Landshut",2
+"229","Passau",2
+"230","Rottal-Inn",2
+"231","Straubing",2
+"232","Amberg",2
+"233","Regensburg",2
+"234","Schwandorf",2
+"235","Weiden",2
+"236","Bamberg",2
+"237","Bayreuth",2
+"238","Coburg",2
+"239","Hof",2
+"240","Kulmbach",2
+"241","Ansbach",2
+"242","Erlangen",2
+"243","Fürth",2
+"244","Nürnberg-Nord",2
+"245","Nürnberg-Süd",2
+"246","Roth",2
+"247","Aschaffenburg",2
+"248","Bad Kissingen",2
+"249","Main-Spessart",2
+"250","Schweinfurt",2
+"251","Würzburg",2
+"252","Augsburg-Stadt",2
+"253","Augsburg-Land",2
+"254","Donau-Ries",2
+"255","Neu-Ulm",2
+"256","Oberallgäu",2
+"257","Ostallgäu",2
+"258","Stuttgart I",1
+"259","Stuttgart II",1
+"260","Böblingen",1
+"261","Esslingen",1
+"262","Nürtingen",1
+"263","Göppingen",1
+"264","Waiblingen",1
+"265","Ludwigsburg",1
+"266","Neckar-Zaber",1
+"267","Heilbronn",1
+"268","Schwäbisch Hall - Hohenlohe",1
+"269","Backnang - Schwäbisch Gmünd",1
+"270","Aalen - Heidenheim",1
+"271","Karlsruhe-Stadt",1
+"272","Karlsruhe-Land",1
+"273","Rastatt",1
+"274","Heidelberg",1
+"275","Mannheim",1
+"276","Odenwald - Tauber",1
+"277","Rhein-Neckar",1
+"278","Bruchsal - Schwetzingen",1
+"279","Pforzheim",1
+"280","Calw",1
+"281","Freiburg",1
+"282","Lörrach - Müllheim",1
+"283","Emmendingen - Lahr",1
+"284","Offenburg",1
+"285","Rottweil - Tuttlingen",1
+"286","Schwarzwald-Baar",1
+"287","Konstanz",1
+"288","Waldshut",1
+"289","Reutlingen",1
+"290","Tübingen",1
+"291","Ulm",1
+"292","Biberach",1
+"293","Bodensee",1
+"294","Ravensburg",1
+"295","Zollernalb - Sigmaringen",1
+"296","Saarbrücken",12
+"297","Saarlouis",12
+"298","St. Wendel",12
+"299","Homburg",12
