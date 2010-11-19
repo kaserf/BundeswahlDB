@@ -109,3 +109,12 @@ WriteSQL("kandidat", Kandidat)
 WriteSQL("landesliste", Landesliste)
 WriteSQL("landesliste_kandidat", Landesliste_Kandidat)
 WriteSQL("kandidat_wahlkreis", Kandidat_Wahlkreis)
+
+# Aggregierte Ergebnisse
+for wk_nummer in wahlkreis_nummern:
+    Wahlergebnis.append("INSERT INTO Wahlergebnis VALUES(%d, %d);" % (wk_nummer, 2005))
+    Wahlergebnis.append("INSERT INTO Wahlergebnis VALUES(%d, %d);" % (wk_nummer, 2009))
+for (wahlkreis, partei, erststimmen, zweitstimmen, jahr) in ergebnisse:
+    if len(erststimmen) != 0:
+       # Direktergebnis.append("INSERT INTO Direktergebnis(partei,stimmenanzahl,wahlergebnis) VALUES(' 
+

@@ -80,7 +80,7 @@ CREATE TABLE Direktergebnis (
 	partei varchar(50),
 	stimmenanzahl integer,
 	wahlergebnis integer REFERENCES Wahlergebnis,
-	primary key (kandidat, wahlergebnis)
+	primary key (partei, wahlergebnis)
 );
 
 -- Enthält Beziehung "part of"
