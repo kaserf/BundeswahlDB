@@ -65,14 +65,14 @@ for (nummer, name, bundeslandnr) in wahlkreise:
 
 WriteSQL("wahlkreis", Wahlkreis)
 
-num_wbs = 20
+#num_wbs = 20
 
 # Wahlbezirke erfinden
-for wk_nummer in wahlkreis_nummern:
-    for wb_nummer in range(0,num_wbs):
-        Wahlbezirk.append("INSERT INTO Wahlbezirk(nummer,wahlkreis) VALUES(%d,%d);" % (wb_nummer, wk_nummer))
-
-WriteSQL("wahlbezirk", Wahlbezirk)
+#for wk_nummer in wahlkreis_nummern:
+#    for wb_nummer in range(0,num_wbs):
+#        Wahlbezirk.append("INSERT INTO Wahlbezirk(nummer,wahlkreis) VALUES(%d,%d);" % (wb_nummer, wk_nummer))
+#
+#WriteSQL("wahlbezirk", Wahlbezirk)
 
 # Kandidaten, Landeslisten und Direktkandidaten
 kandidatnr = 0

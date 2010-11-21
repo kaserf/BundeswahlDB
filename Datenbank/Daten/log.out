@@ -1,11 +1,10 @@
-psql:../schema.sql:2: HINWEIS:  Löschvorgang löscht ebenfalls 13 weitere Objekte
+psql:../schema.sql:2: HINWEIS:  Löschvorgang löscht ebenfalls 12 weitere Objekte
 DETAIL:  Löschvorgang löscht ebenfalls Tabelle partei
 Löschvorgang löscht ebenfalls Tabelle kandidat
 Löschvorgang löscht ebenfalls Tabelle bundesland
 Löschvorgang löscht ebenfalls Tabelle wahlkreis
 Löschvorgang löscht ebenfalls Tabelle wahlbezirk
 Löschvorgang löscht ebenfalls Tabelle landesliste
-Löschvorgang löscht ebenfalls Tabelle wahlberechtigte
 Löschvorgang löscht ebenfalls Tabelle wahlergebnis
 Löschvorgang löscht ebenfalls Tabelle direktergebnis
 Löschvorgang löscht ebenfalls Tabelle listenergebnis
@@ -16,21 +15,19 @@ psql:../schema.sql:9: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit ein
 psql:../schema.sql:21: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »kandidat_pkey« für Tabelle »kandidat«
 psql:../schema.sql:27: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »bundesland_pkey« für Tabelle »bundesland«
 psql:../schema.sql:34: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlkreis_pkey« für Tabelle »wahlkreis«
-psql:../schema.sql:48: HINWEIS:  CREATE TABLE erstellt implizit eine Sequenz »wahlbezirk_id_seq« für die »serial«-Spalte »wahlbezirk.id«
-psql:../schema.sql:48: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlbezirk_pkey« für Tabelle »wahlbezirk«
-psql:../schema.sql:48: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »wahlbezirk_nummer_key« für Tabelle »wahlbezirk«
-psql:../schema.sql:55: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »landesliste_pkey« für Tabelle »landesliste«
-psql:../schema.sql:55: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »landesliste_partei_key« für Tabelle »landesliste«
-psql:../schema.sql:69: HINWEIS:  CREATE TABLE erstellt implizit eine Sequenz »wahlberechtigte_ausweisnummer_seq« für die »serial«-Spalte »wahlberechtigte.ausweisnummer«
-psql:../schema.sql:69: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlberechtigte_pkey« für Tabelle »wahlberechtigte«
-psql:../schema.sql:76: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlergebnis_pkey« für Tabelle »wahlergebnis«
-psql:../schema.sql:87: HINWEIS:  CREATE TABLE erstellt implizit eine Sequenz »direktergebnis_id_seq« für die »serial«-Spalte »direktergebnis.id«
-psql:../schema.sql:87: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »direktergebnis_pkey« für Tabelle »direktergebnis«
-psql:../schema.sql:96: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »listenergebnis_pkey« für Tabelle »listenergebnis«
-psql:../schema.sql:104: HINWEIS:  CREATE TABLE erstellt implizit eine Sequenz »wahlzettel_id_seq« für die »serial«-Spalte »wahlzettel.id«
-psql:../schema.sql:104: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlzettel_pkey« für Tabelle »wahlzettel«
-psql:../schema.sql:113: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »landesliste_kandidat_pkey« für Tabelle »landesliste_kandidat«
-psql:../schema.sql:113: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »landesliste_kandidat_kandidat_key« für Tabelle »landesliste_kandidat«
-psql:../schema.sql:113: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »landesliste_kandidat_landesliste_key« für Tabelle »landesliste_kandidat«
-psql:../schema.sql:120: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »kandidat_wahlkreis_pkey« für Tabelle »kandidat_wahlkreis«
-psql:../schema.sql:120: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »kandidat_wahlkreis_kandidat_key« für Tabelle »kandidat_wahlkreis«
+psql:../schema.sql:47: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlbezirk_pkey« für Tabelle »wahlbezirk«
+psql:../schema.sql:54: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »landesliste_pkey« für Tabelle »landesliste«
+psql:../schema.sql:54: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »landesliste_partei_key« für Tabelle »landesliste«
+psql:../schema.sql:70: HINWEIS:  CREATE TABLE erstellt implizit eine Sequenz »wahlberechtigte_ausweisnummer_seq« für die »serial«-Spalte »wahlberechtigte.ausweisnummer«
+psql:../schema.sql:70: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlberechtigte_pkey« für Tabelle »wahlberechtigte«
+psql:../schema.sql:77: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlergebnis_pkey« für Tabelle »wahlergebnis«
+psql:../schema.sql:88: HINWEIS:  CREATE TABLE erstellt implizit eine Sequenz »direktergebnis_id_seq« für die »serial«-Spalte »direktergebnis.id«
+psql:../schema.sql:88: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »direktergebnis_pkey« für Tabelle »direktergebnis«
+psql:../schema.sql:97: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »listenergebnis_pkey« für Tabelle »listenergebnis«
+psql:../schema.sql:108: HINWEIS:  CREATE TABLE erstellt implizit eine Sequenz »wahlzettel_id_seq« für die »serial«-Spalte »wahlzettel.id«
+psql:../schema.sql:108: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »wahlzettel_pkey« für Tabelle »wahlzettel«
+psql:../schema.sql:117: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »landesliste_kandidat_pkey« für Tabelle »landesliste_kandidat«
+psql:../schema.sql:117: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »landesliste_kandidat_kandidat_key« für Tabelle »landesliste_kandidat«
+psql:../schema.sql:117: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »landesliste_kandidat_landesliste_key« für Tabelle »landesliste_kandidat«
+psql:../schema.sql:124: HINWEIS:  CREATE TABLE / PRIMARY KEY erstellt implizit einen Index »kandidat_wahlkreis_pkey« für Tabelle »kandidat_wahlkreis«
+psql:../schema.sql:124: HINWEIS:  CREATE TABLE / UNIQUE erstellt implizit einen Index »kandidat_wahlkreis_kandidat_key« für Tabelle »kandidat_wahlkreis«

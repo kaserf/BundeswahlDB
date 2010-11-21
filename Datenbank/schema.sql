@@ -35,7 +35,6 @@ CREATE TABLE Wahlkreis (
 
 -- Enthält Beziehung "WB liegt in"
 CREATE TABLE Wahlbezirk (
-	id serial primary key,
 	nummer integer,
 	--name varchar(50),
 	--wahlvorstand varchar(50),
@@ -44,7 +43,7 @@ CREATE TABLE Wahlbezirk (
 	--postleitzahl integer,
 	--stadt varchar,
 	wahlkreis integer REFERENCES Wahlkreis,
-	unique (nummer, wahlkreis)
+	primary key (nummer, wahlkreis)
 );
 -- Enthält Beziehung "gehört zu", "aufgestellt für"
 CREATE TABLE Landesliste (
@@ -64,8 +63,10 @@ CREATE TABLE Wahlberechtigte (
 	hausnummer integer,
 	postleitzahl integer,
 	stadt varchar(50),
-	wahlbezirk integer REFERENCES Wahlbezirk,
-	gewaehlt boolean
+	gewaehlt boolean,
+	wahlbezirk integer,
+	wahlkreis integer,
+	FOREIGN KEY (wahlbezirk,wahlkreis) REFERENCES Wahlbezirk
 );
 
 -- Enthält Beziehung "hat"
@@ -100,7 +101,10 @@ CREATE TABLE Wahlzettel (
 	id serial primary key,
 	erststimme integer REFERENCES Kandidat,
 	zweitstimme integer REFERENCES Partei,
-	wahlbezirk integer REFERENCES Wahlbezirk
+	wahlbezirk integer,
+	wahlkreis integer,
+	FOREIGN KEY (wahlbezirk, wahlkreis) REFERENCES Wahlbezirk
+
 );
 
 -- Beziehung "vertreten auf"
