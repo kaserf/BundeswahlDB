@@ -1,0 +1,32 @@
+
+anzahl_stimmen = SELECT COUNT(*) FROM Wahlzettel
+anzahl_sitze = 598 - (anzahl direktmandate ohne partei *)
+hare_quote = anzahl_stimmen/anzahl_sitze
+
+//* = direktmandate ohne partei bzw partei unter sperrklausel (unter 5% und keine 3 direktmandate und keine Minderheitenpartei)
+
+//pro partei bundesweite stimmenanzahl herausfinden und sainte-lague berechnen
+/* sainte-lague mit höchstzahl:
+   neue tabelle erstellen mit Tmp = (partei, durchgang, stimmenanzahl) und für jede partei
+   anz.stimmen/(0.5, 1.5, 2.5, ...) berechnen (metrik: bis stimmenanzahl < hare quote)
+   dann nach stimmenanzahl sortieren (desc) und die ersten 598 auswählen (limit?). Dann kann man die parteien zählen und schauen wie viele sitze jede partei kriegt */
+
+foreach partei
+  bundes_stimmen = SELECT COUNT(*) FROM Wahlzettel w WHERE w.partei = partei
+
+  //parteien die sperrklausel nicht erfüllen überspringen
+  if (sperrklausel(bundesstimmen))
+    continue;
+
+  durchgang = 0.5
+  durchgangs_stimmen = bundes_stimmen / durchgang
+  while bundes_stimmen > hare_quote
+    INSERT INTO Tmp VALUES (partei, durchgang, bundes_stimmen)
+    durchgang = durchgang + 1
+    durchgangs_stimmen = bundesstimmen / durchgang
+
+
+//sitzverteilung berechnen
+SELECT Partei, COUNT(durchgang) as Sitze
+FROM (SELECT * FROM Tmp ORDER BY stimmenanzahl DESC LIMIT 0,<anz zu verteilende sitze>)
+GROUP BY Partei
