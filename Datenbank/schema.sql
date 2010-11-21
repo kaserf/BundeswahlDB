@@ -70,22 +70,26 @@ CREATE TABLE Wahlberechtigte (
 
 -- Enthält Beziehung "hat"
 CREATE TABLE Wahlergebnis (
-	wahljahr integer primary key,
+	id integer primary key,
+	wahljahr integer,
 	wahlkreis integer REFERENCES Wahlkreis
 );
 
 -- Enthält Beziehung "part of"
+-- TODO: Referenzierung in der Doku ergänzen
 CREATE TABLE Direktergebnis (
-	kandidat varchar(50),
-	partei varchar(50),
+	id serial primary key,
+	kandidat integer REFERENCES Kandidat,
+	partei integer REFERENCES Partei,
 	stimmenanzahl integer,
-	wahlergebnis integer REFERENCES Wahlergebnis,
-	primary key (partei, wahlergebnis)
+	wahlergebnis integer REFERENCES Wahlergebnis
+	--primary key (kandidat, wahlergebnis)
 );
 
 -- Enthält Beziehung "part of"
+-- TODO: Referenzierung in der Doku ergänzen
 CREATE TABLE Listenergebnis (
-	partei varchar(50),
+	partei integer REFERENCES Partei,
 	stimmenanzahl integer,
 	wahlergebnis integer REFERENCES Wahlergebnis,
 	primary key (partei, wahlergebnis)

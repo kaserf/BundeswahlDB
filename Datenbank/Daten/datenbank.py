@@ -3,10 +3,10 @@
 
 import csv
 
-def OpenCSV(name, skipfirst=True):
+def OpenCSV(name, skipfirst=True, delimiter=','):
     csvfile = open(name, 'r')
     dialect = csv.Sniffer().sniff(csvfile.read(1024))
-    dialect.delimiter = ','
+    dialect.delimiter = delimiter
     csvfile.seek(0)
     reader = csv.reader(csvfile, dialect)
     if skipfirst:
@@ -25,7 +25,7 @@ laender = OpenCSV('Wahlbewerber_2009_Bundeslaender.csv', skipfirst=False)
 kandidaten = OpenCSV('Wahlbewerber_2009_Kandidaten.csv')
 parteien = OpenCSV('Wahlbewerber_2009_Parteien.csv')
 wahlkreise = OpenCSV('Wahlbewerber_2009_Wahlkreise.csv')
-ergebnisse = OpenCSV('Wahlkreis_Ergebnisse.csv')
+ergebnisse = OpenCSV('Wahlkreis_Ergebnisse.csv', delimiter=';')
 
 Partei = [] #
 Kandidat = [] #
@@ -76,6 +76,8 @@ WriteSQL("wahlbezirk", Wahlbezirk)
 
 # Kandidaten, Landeslisten und Direktkandidaten
 kandidatnr = 0
+kandidat_partei = {}
+kandidat_map = {}
 landeslisten = {}
 landeslistennr = 0
 
@@ -85,6 +87,7 @@ for (nachname, vorname, geburtsjahr, partei, parteinr, land, landnr, platz, wknr
     if partei.startswith("K:"):
         parteinr = 99
     Kandidat.append("INSERT INTO Kandidat VALUES(%d, '%s', '%s', %s, %d);" % (kandidatnr, vorname, nachname, geburtsjahr, parteinr))
+    kandidat_partei[kandidatnr] = parteinr
     
     # Listenkandidatur
     if landnr.isalnum():
@@ -103,6 +106,8 @@ for (nachname, vorname, geburtsjahr, partei, parteinr, land, landnr, platz, wknr
     if wknr.isalnum():
         wknr = int(wknr)
         Kandidat_Wahlkreis.append("INSERT INTO Kandidat_Wahlkreis VALUES(%d, %d);" % (kandidatnr, wknr))
+        partei = kandidat_partei[kandidatnr]
+        kandidat_map[(partei,wknr)] = kandidatnr
     kandidatnr += 1
 
 WriteSQL("kandidat", Kandidat)
@@ -111,10 +116,30 @@ WriteSQL("landesliste_kandidat", Landesliste_Kandidat)
 WriteSQL("kandidat_wahlkreis", Kandidat_Wahlkreis)
 
 # Aggregierte Ergebnisse
+wahlergebnisse = {}
+we_nr = 0
 for wk_nummer in wahlkreis_nummern:
-    Wahlergebnis.append("INSERT INTO Wahlergebnis VALUES(%d, %d);" % (wk_nummer, 2005))
-    Wahlergebnis.append("INSERT INTO Wahlergebnis VALUES(%d, %d);" % (wk_nummer, 2009))
+    Wahlergebnis.append("INSERT INTO Wahlergebnis VALUES(%d, %d, %d);" % (we_nr, 2005, wk_nummer))
+    wahlergebnisse[(wk_nummer, 2005)] = we_nr
+    Wahlergebnis.append("INSERT INTO Wahlergebnis VALUES(%d, %d, %d);" % (we_nr + 1, 2009, wk_nummer))
+    wahlergebnisse[(wk_nummer, 2009)] = we_nr + 1
+    we_nr += 2
 for (wahlkreis, partei, erststimmen, zweitstimmen, jahr) in ergebnisse:
+    wahlkreis = int(wahlkreis)
+    jahr = int(jahr)
+    partei = int(partei)
+    wahlergebnisnr = wahlergebnisse[(wahlkreis, jahr)]
     if len(erststimmen) != 0:
-       # Direktergebnis.append("INSERT INTO Direktergebnis(partei,stimmenanzahl,wahlergebnis) VALUES(' 
+        erststimmen = int(erststimmen)
+        if (jahr == 2005):
+            Direktergebnis.append("INSERT INTO Direktergebnis(partei,stimmenanzahl,wahlergebnis) VALUES(%d, %d, %d);" % (partei, erststimmen, wahlergebnisnr))
+        if (jahr == 2009):
+            kandidat = kandidat_map[(partei, wahlkreis)]
+            Direktergebnis.append("INSERT INTO Direktergebnis(kandidat,partei,stimmenanzahl,wahlergebnis) VALUES(%d, %d, %d, %d);" % (kandidat, partei, erststimmen, wahlergebnisnr))
+    if (len(zweitstimmen)) != 0:
+        zweitstimmen = int(zweitstimmen)
+        Listenergebnis.append("INSERT INTO Listenergebnis VALUES(%d, %d, %d);" % (partei, zweitstimmen, wahlergebnisnr))
 
+WriteSQL("wahlergebnis", Wahlergebnis)
+WriteSQL("direktergebnis", Direktergebnis)
+WriteSQL("listenergebnis", Listenergebnis)
