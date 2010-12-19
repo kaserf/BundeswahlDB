@@ -26,6 +26,7 @@ kandidaten = OpenCSV('Wahlbewerber_2009_Kandidaten.csv')
 parteien = OpenCSV('Wahlbewerber_2009_Parteien.csv')
 wahlkreise = OpenCSV('Wahlbewerber_2009_Wahlkreise.csv')
 ergebnisse = OpenCSV('Wahlkreis_Ergebnisse.csv', delimiter=';')
+struktur = OpenCSV('struktur_kreis.csv', delimiter=';')
 
 Partei = [] #
 Kandidat = [] #
@@ -40,6 +41,7 @@ Listenergebnis = []
 Wahlzettel = []
 Landesliste_Kandidat = [] #
 Kandidat_Wahlkreis = [] #
+Struktur = []
 
 # Laender einlesen
 for (nummer, name, kurz) in laender:
@@ -65,6 +67,11 @@ for (nummer, name, bundeslandnr) in wahlkreise:
 
 WriteSQL("wahlkreis", Wahlkreis)
 
+# Strukturdaten einlesen
+for (wk, jahr, ber, w, ung1, ung2, g1, g2) in struktur:
+    Struktur.append("INSERT INTO Struktur VALUES(%d, %d, %d, %d, %d, %d, %d, %d);" % (int(wk), int(jahr), int(ber), int(w), int(ung1), int(ung2), int(g1), int(g2)))
+
+WriteSQL("struktur", Struktur)
 #num_wbs = 20
 
 # Wahlbezirke erfinden

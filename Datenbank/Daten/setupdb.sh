@@ -15,6 +15,10 @@ echo "Adding wahlkreis. (Enter to start)"
 read
 psql -d Bundestagswahl -f wahlkreis.sql
 
+echo "Adding strukturdaten. (Enter to start)"
+read
+psql -d Bundestagswahl -f struktur.sql
+
 #echo "Adding wahlbezirk. (Enter to start)"
 #read
 #psql -d Bundestagswahl -f wahlbezirk.sql
