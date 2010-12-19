@@ -6,7 +6,7 @@ from psycopg2 import extras
 
 #######################################
 # Richtiges Bundesland hier eintragen!#
-bundesland = 'Bayern'
+bundesland = 'Bremen'
 #######################################
 
 try:
@@ -63,7 +63,11 @@ for wahlkreis in wahlkreise:
         if (j == 1):
             cur.execute("""INSERT INTO Wahlbezirk VALUES(%d, %d);""" % (wahlbezirknr, wahlkreis)) 
         cur.execute("""INSERT INTO Wahlzettel(erststimme,zweitstimme,wahlbezirk,wahlkreis) VALUES(%s, %s, %d, %d);""" % (str(erststimme), str(zweitstimme), wahlbezirknr, wahlkreis))
+        cur.execute("""INSERT INTO Wahlberechtigte (gewaehlt, wahlbezirk, wahlkreis) VALUES(true, %d, %d);""" % (wahlbezirknr, wahlkreis))
+        #conn.commit()
         if (j == 2500):
+            conn.commit()
+            print "commit"
             wahlbezirknr += 1
             j = 0
         j += 1
