@@ -71,3 +71,27 @@ for wahlkreis in wahlkreise:
             wahlbezirknr += 1
             j = 0
         j += 1
+
+    #just to be sure...
+    conn.commit()
+
+    cur.execute("""SELECT wahlberechtigte FROM Struktur WHERE wahlkreis = %d AND jahr = 2009""" % (wahlkreis))
+    rows = cur.fetchall()
+    berechtigte = rows[0][0]
+    cur.execute("""SELECT COUNT(*) FROM Wahlzettel WHERE wahlkreis = %d""" % (wahlkreis))
+    rows = cur.fetchall()
+    gewaehlt = rows[0][0]
+
+    #new wahlbezirk, for those who did not vote
+    wahlbezirknr += 1
+    cur.execute("""INSERT INTO Wahlbezirk VALUES(%d, %d);""" % (wahlbezirknr, wahlkreis))
+    conn.commit()
+
+    if (gewaehlt > berechtigte):
+        print "da ging was schief, mehr leute haben gewählt als erlaubt"
+    else:
+        while (berechtigte > gewaehlt):
+            cur.execute("""INSERT INTO Wahlberechtigte (gewaehlt, wahlbezirk, wahlkreis) VALUES(false, %d, %d);""" % (wahlbezirknr, wahlkreis))
+            gewaehlt += 1
+
+    conn.commit()
