@@ -33,6 +33,19 @@ CREATE TABLE Wahlkreis (
 	bundesland integer REFERENCES Bundesland
 );
 
+-- TODO: in doku eintragen
+CREATE TABLE Struktur (
+	wahlkreis integer REFERENCES Wahlkreis,
+	jahr integer,
+	wahlberechtigte integer,
+	waehler integer,
+	ungueltig_erst integer,
+	ungueltig_zweit integer,
+	gueltig_erst integer,
+	gueltig_zweit integer,
+	primary key (wahlkreis, jahr)
+);
+
 -- Enthält Beziehung "WB liegt in"
 CREATE TABLE Wahlbezirk (
 	nummer integer,
