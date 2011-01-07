@@ -12,6 +12,7 @@ CREATE TABLE Kandidat (
 	ausweisnummer integer primary key,
 	vorname varchar(50),
 	nachname varchar(50),
+	--geburtsjahr zu date wechseln?
 	geburtsjahr varchar(4),
 	partei integer REFERENCES Partei
 	--strasse varchar(50),
@@ -71,6 +72,7 @@ CREATE TABLE Wahlberechtigte (
 	ausweisnummer serial primary key,
 	--vorname varchar(50),
 	--nachname varchar(50),
+	--geburtsdatum als DATE?
 	--geburtsdatum varchar(10),
 	--strasse varchar(50),
 	--hausnummer integer,
@@ -134,4 +136,10 @@ CREATE TABLE Kandidat_Wahlkreis (
 	kandidat integer REFERENCES Kandidat unique,
 	wahlkreis integer REFERENCES Wahlkreis,
 	primary key (kandidat, wahlkreis)
+);
+
+-- Tabelle für die gwählten kandidaten
+CREATE TABLE Kandidaten_Gewaehlt (
+	kandidat integer primary key references Kandidat,
+	direktkandidat_wk integer references wahlkreis
 );
