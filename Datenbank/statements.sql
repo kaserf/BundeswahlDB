@@ -92,7 +92,7 @@ INSERT INTO Kandidaten_Gewaehlt
 --	)
 	parteien_deutschland as
 	(
-		select Partei, sum(stimmenanzahl) as partei_stimmen, cast(sum(stimmenanzahl) as float)/(select gueltige_stimmen from struktur_deutschland)*100 as prozente
+		select Partei, sum(stimmenanzahl) as partei_stimmen, cast(sum(stimmenanzahl) as float)/(select gueltige_stimmen from struktur_deutschland) as prozente
 		from ergebnis_pro_wk
 		group by Partei
 	),
@@ -136,7 +136,7 @@ INSERT INTO Kandidaten_Gewaehlt
 	(
 		select K.Partei, W.Bundesland, count(*) as Direktmandate
 		from Kandidaten_Gewaehlt G, Kandidat K, Wahlkreis W
-		where not G.direktkandidat_wk is null and G.direktkandidat_wk=W.Nummer and G.Kandidat=K.ausweisnummer and not K.Partei is null
+		where not G.direktkandidat_wk is null and G.direktkandidat_wk=W.Nummer and G.Kandidat=K.ausweisnummer and K.Partei <> 99
 		group by K.Partei,W.Bundesland
 	),
 	--Überhangmandate berechnen
