@@ -50,3 +50,7 @@ psql -U postgres -d Bundestagswahl -f direktergebnis.sql
 echo "Adding listenergebnis. (Enter to start)"
 :: read
 psql -U postgres -d Bundestagswahl -f listenergebnis.sql
+
+echo "Adding divisor. (Enter to start)"
+:: read
+psql -U postgres -d Bundestagswahl -f divisor.sql

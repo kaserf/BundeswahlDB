@@ -138,8 +138,13 @@ CREATE TABLE Kandidat_Wahlkreis (
 	primary key (kandidat, wahlkreis)
 );
 
--- Tabelle für die gwählten kandidaten
+-- Tabelle für die gewählten Kandidaten (Kandidaten mit Sitze)
 CREATE TABLE Kandidaten_Gewaehlt (
 	kandidat integer primary key references Kandidat,
 	direktkandidat_wk integer references wahlkreis
+);
+
+-- Tabelle für die Divisoren
+CREATE TABLE Divisor(
+	divisor decimal(4,1)
 );
