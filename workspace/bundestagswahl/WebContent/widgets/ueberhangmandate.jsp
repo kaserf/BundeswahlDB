@@ -6,14 +6,12 @@
 <%@page import="data.Ueberhangmandate"%>
 <%@page import="java.util.List"%>
 <%@page import="beans.Auswertung"%>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+<%@page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 
-<div id='map_canvas'></div>
+<div id='map_canvas' align="center"></div>
 
-<div id="mandate">
-
-</div>
+<div id="mandate"></div>
 
 <%
 	Auswertung auswertung = new Auswertung();
@@ -27,7 +25,7 @@
 		var data = new google.visualization.DataTable();
 	    data.addRows(<%= anzahlBl %>);
 	    data.addColumn('string', 'Kuerzel');
-	    data.addColumn('number', '');
+	    data.addColumn('number', 'Überhangmandate');
 	    data.addColumn('string', 'Bundeslandname');
     
 <%
@@ -59,11 +57,14 @@
 	    geomap.draw(data, options);
 	    google.visualization.events.addListener(
 	    	geomap, 'select', function() {
+	    		geomap.setSelection(geomap.getSelection());
 	    		var row = geomap.getSelection()[0].row;
 	    		var selectedBl = data.getValue(row, 0);
-	    		$('#mandate').load('widgets/ueberhangmandattabelle.jsp?bundesland=' + selectedBl, function() {
-					$('#mandate').fadeIn();
-				});
+	    		$('#mandate').fadeOut(function() {
+	    			$('#mandate').load('widgets/ueberhangmandattabelle.jsp?bundesland=' + selectedBl, function() {
+						$('#mandate').fadeIn();
+					});
+	    		});
 	    	}		
 	    );
 	};
