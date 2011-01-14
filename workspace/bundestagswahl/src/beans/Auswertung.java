@@ -66,7 +66,8 @@ import javax.sql.DataSource;
      initConnection();
      Statement stmt = this.connection.createStatement();
      ResultSet result = stmt
-       .executeQuery("SELECT p.kurzbezeichnung FROM Kandidaten_gewaehlt g, Kandidat k, Partei p WHERE g.kandidat = k.ausweisnummer AND k.partei = p.nummer");
+       .executeQuery("SELECT p.kurzbezeichnung FROM Kandidaten_gewaehlt g, " +
+       		"Kandidat k, Partei p WHERE g.kandidat = k.ausweisnummer AND k.partei = p.nummer");
  
      Map<String, Integer> sitze = new HashMap<String, Integer>();
      while (result.next()) {
