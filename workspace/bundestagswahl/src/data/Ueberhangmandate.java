@@ -3,18 +3,18 @@ package data;
 import java.util.List;
 
 public class Ueberhangmandate {
-	private String bundesland;
+	private Bundesland bundesland;
 	private List<Einzelergebnis<Partei, Integer>> mandate;
 	
-	public Ueberhangmandate(String bundesland, List<Einzelergebnis<Partei, Integer>> mandate) {
+	public Ueberhangmandate(Bundesland bundesland, List<Einzelergebnis<Partei, Integer>> mandate) {
 		setBundesland(bundesland);
 		setMandate(mandate);
 	}
 	
-	public void setBundesland(String bundesland) {
+	public void setBundesland(Bundesland bundesland) {
 		this.bundesland = bundesland;
 	}
-	public String getBundesland() {
+	public Bundesland getBundesland() {
 		return bundesland;
 	}
 	public void setMandate(List<Einzelergebnis<Partei, Integer>> mandate) {

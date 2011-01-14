@@ -9,84 +9,64 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 
-<%
-	Auswertung auswertung = new Auswertung();
-	List<Ueberhangmandate> mandate = auswertung.getUeberhangmandate();
-%>
-
 <div id='map_canvas'></div>
 
-<% 
-	String selectedBundesland = "Bayern";
-	Ueberhangmandate blMandat = null;
-	for (Ueberhangmandate mandat : mandate) {
-		if (mandat.getBundesland().equals(selectedBundesland)) {
-			blMandat = mandat;
-			break;
-		}
-	}
-%>
-
 <div id="mandate">
-	<table id="mandateTable" class="tablesorter ui-corner-all"> 
-	<thead> 
-	<tr> 
-	    <th>Partei</th>
-	    <th>Überhangmandate</th> 
-	</tr> 
-	</thead> 
-	<tbody>
-	<%
-		for  (Einzelergebnis<Partei, Integer> parteiMandate : blMandat.getMandate()) {		
-	%>
-	<tr> 
-	    <td><%= parteiMandate.getEntity() %></td>
-	    <td><%= parteiMandate.getValue() %></td> 
-	</tr>
-	<%
-		}
-	%>
-	</tbody> 
-	</table>
+
 </div>
 
 <%
+	Auswertung auswertung = new Auswertung();
+	List<Ueberhangmandate> mandate = auswertung.getUeberhangmandate();
 	List<Bundesland> bundeslaender = auswertung.getAllBundeslaender();
 	int anzahlBl = bundeslaender.size();
 %>
 
 <script type='text/javascript'>
-function drawMap() {
-	var data = new google.visualization.DataTable();
-    data.addRows(<%= anzahlBl %>);
-    data.addColumn('string', 'Kuerzel');
-    data.addColumn('number', '');
-    data.addColumn('string', 'Bundeslandname');
+	function drawMap() {
+		var data = new google.visualization.DataTable();
+	    data.addRows(<%= anzahlBl %>);
+	    data.addColumn('string', 'Kuerzel');
+	    data.addColumn('number', '');
+	    data.addColumn('string', 'Bundeslandname');
     
 <%
-	Map<String, Integer> anzahlMandate = new HashMap<String, Integer>();
-	for (Ueberhangmandate mandat : mandate) {
-		anzahlMandate.put(mandat.getBundesland(), mandat.getMandate().size());
-	}
-	for (Bundesland bl : bundeslaender) {
-		int index = bundeslaender.indexOf(bl);
-		
+		Map<String, Integer> anzahlMandate = new HashMap<String, Integer>();
+		for (Ueberhangmandate mandat : mandate) {
+			int size = 0;
+			for (Einzelergebnis<Partei, Integer> erg : mandat.getMandate()) {
+				size += erg.getValue();
+			}
+			anzahlMandate.put(mandat.getBundesland().getKuerzel(), size);
+		}
+		for (Bundesland bl : bundeslaender) {
+			int index = bundeslaender.indexOf(bl);
+			int anzahl = anzahlMandate.get(bl.getKuerzel());
 %>
-    data.setValue(<%= index %>, 0, '<%= "DE-" + bl.getKuerzel() %>');
-    data.setValue(<%= index %>, 1, 2);
-    data.setValue(<%= index %>, 2, '<%= bl.getName() %>');
+		    data.setValue(<%= index %>, 0, '<%= "DE-" + bl.getKuerzel() %>');
+		    data.setValue(<%= index %>, 1, <%= anzahl %>);
+		    data.setValue(<%= index %>, 2, '<%= bl.getName() %>');
 <%
-	}
+		}
 %>
-    var options = {};
-    options['dataMode'] = 'regions';
-    options['region'] = 'DE';
-    options['showLegend'] = false;
-
-    var container = document.getElementById('map_canvas');
-    var geomap = new google.visualization.GeoMap(container);
-    geomap.draw(data, options);
-};
-drawMap();
+	    var options = {};
+	    options['dataMode'] = 'regions';
+	    options['region'] = 'DE';
+	    options['showLegend'] = false;
+	
+	    var container = document.getElementById('map_canvas');
+	    var geomap = new google.visualization.GeoMap(container);
+	    geomap.draw(data, options);
+	    google.visualization.events.addListener(
+	    	geomap, 'select', function() {
+	    		var row = geomap.getSelection()[0].row;
+	    		var selectedBl = data.getValue(row, 0);
+	    		$('#mandate').load('widgets/ueberhangmandattabelle.jsp?bundesland=' + selectedBl, function() {
+					$('#mandate').fadeIn();
+				});
+	    	}		
+	    );
+	};
+	drawMap();
 
   </script>

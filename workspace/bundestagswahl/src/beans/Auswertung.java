@@ -241,7 +241,7 @@ import javax.sql.DataSource;
 		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("FDP"), 5));
 		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("CDU"), 7));
 		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("Grüne"), 3));
-		   Ueberhangmandate mandat = new Ueberhangmandate(bundesland.getName(), ergebnisse);
+		   Ueberhangmandate mandat = new Ueberhangmandate(bundesland, ergebnisse);
 		   mandate.add(mandat);
 	   }
 	   return mandate;
