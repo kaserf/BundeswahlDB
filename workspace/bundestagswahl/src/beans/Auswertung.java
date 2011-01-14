@@ -3,6 +3,7 @@
  import data.Bundesland;
  import data.Einzelergebnis;
  import data.Kandidat;
+import data.KnappsterSieger;
  import data.Listenkandidatur;
  import data.Partei;
  import data.Sitzverteilung;
@@ -37,8 +38,8 @@ import javax.sql.DataSource;
      try
      {
        Context initCtx = new InitialContext();
-       Context envCtx = (Context)initCtx.lookup("java:comp/env");
-       DataSource ds = (DataSource)envCtx.lookup("jdbc/Bundestagswahl");
+       Context envCtx = (Context) initCtx.lookup("java:comp/env");
+       DataSource ds = (DataSource) envCtx.lookup("jdbc/Bundestagswahl");
        this.connection = ds.getConnection();
      } catch (SQLException e) {
        e.printStackTrace();
@@ -59,6 +60,8 @@ import javax.sql.DataSource;
      }
    }
  
+   /** Q1: Sitzverteilung */
+   /** TODO: SQL Query may be improved by crazy aggregation stuff :D */
    public Sitzverteilung getSitzverteilung() throws SQLException {
      initConnection();
      Statement stmt = this.connection.createStatement();
@@ -84,21 +87,19 @@ import javax.sql.DataSource;
      return new Sitzverteilung(parteiSitze);
    }
  
-   private Kandidat createKandidat(String nachname, String vorname, String partei, int wkr, String bundesland, int platz)
-   {
-     Listenkandidatur kandidatur = new Listenkandidatur(
-       new Bundesland(bundesland, null), platz);
-     return new Kandidat(nachname, vorname, new Partei(partei), wkr, 
-       kandidatur);
-   }
- 
+   /** Q2: Bundestagsmitglieder */
    public List<Kandidat> getBundestagsMitglieder() throws SQLException
    {
      initConnection();
      Statement stmt = this.connection.createStatement();
      List<Kandidat> kandidaten = new ArrayList<Kandidat>();
      ResultSet result = stmt
-       .executeQuery("SELECT * FROM Kandidaten_gewaehlt g JOIN Kandidat k ON g.kandidat = k.ausweisnummer JOIN Partei p ON k.partei = p.nummer LEFT OUTER JOIN (Landesliste_Kandidat lk JOIN Landesliste l ON lk.landesliste = l.id JOIN Bundesland b ON l.bundesland = b.nummer) ON lk.kandidat = g.kandidat");
+       .executeQuery("SELECT * FROM Kandidaten_gewaehlt g " +
+       		"JOIN Kandidat k ON g.kandidat = k.ausweisnummer " +
+       		"JOIN Partei p ON k.partei = p.nummer " +
+       		"LEFT OUTER JOIN (Landesliste_Kandidat lk " +
+       		"JOIN Landesliste l ON lk.landesliste = l.id " +
+       		"JOIN Bundesland b ON l.bundesland = b.nummer) ON lk.kandidat = g.kandidat");
  
      while (result.next()) {
        String nachname = result.getString("nachname");
@@ -120,6 +121,7 @@ import javax.sql.DataSource;
      return kandidaten;
    }
  
+   /** Helper method for queries and jsps. */
    public List<Bundesland> getAllBundeslaender() throws SQLException {
      initConnection();
      Statement stmt = this.connection.createStatement();
@@ -132,6 +134,7 @@ import javax.sql.DataSource;
      return bundeslaender;
    }
  
+   /** Creates a {@link Bundesland} object from a result set. */
    private Bundesland createBundesland(ResultSet result) throws SQLException {
      Bundesland bundesland = new Bundesland();
      bundesland.setKuerzel(result.getString("kuerzel"));
@@ -142,6 +145,7 @@ import javax.sql.DataSource;
      return bundesland;
    }
  
+   /** Gets all {@link Wahlkreis}e for a {@link Bundesland}. */
    public List<Wahlkreis> getWahlkreiseForBundesland(int bundeslandNr) throws SQLException
    {
      initConnection();
@@ -159,6 +163,7 @@ import javax.sql.DataSource;
      return wahlkreise;
    }
  
+   /** Gets a {@link Bundesland} object from its id. Convenience method for jsps */
    public Bundesland getBundesland(int bundeslandnr) throws SQLException {
      initConnection();
      Statement stmt = this.connection.createStatement();
@@ -173,6 +178,8 @@ import javax.sql.DataSource;
      return bundesland;
    }
  
+   /** Q3: Wahlkreisübersicht */
+   /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
    public WahlkreisUebersicht getWahlkreisUebersicht(int id) {
      List<Einzelergebnis<Partei, Integer>> stimmenAbsolut = new ArrayList<Einzelergebnis<Partei, Integer>>();
      stimmenAbsolut.add(
@@ -200,17 +207,30 @@ import javax.sql.DataSource;
        stimmenAbsolut, stimmenProzentual, stimmenEntwicklung);
    }
    
+   /** Convenience method for stubbing. */
+   private Kandidat createKandidat(String nachname, String vorname, String partei, int wkr, String bundesland, int platz)
+   {
+     Listenkandidatur kandidatur = new Listenkandidatur(
+       new Bundesland(bundesland, null), platz);
+     return new Kandidat(nachname, vorname, new Partei(partei), wkr, 
+       kandidatur);
+   }
+   
+   /** Q4: Wahlkreissieger */
+   /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
    public List<Wahlkreissieger> getWahlkreisSieger() {
 	   List<Wahlkreissieger> sieger = new ArrayList<Wahlkreissieger>();
 	   for (int i = 0; i < 299; i++) {
 		   Wahlkreissieger wahlkreissieger = new Wahlkreissieger(i, 
-				   new Einzelergebnis<Kandidat, Integer>(new Kandidat("Horst", "Schmidt", null, i, null), 85), 
+				   new Einzelergebnis<Kandidat, Integer>(new Kandidat("Schmidt", "Horst", null, i, null), 85), 
 				   new Einzelergebnis<Partei, Integer>(new Partei("SPD"), 35));
 		   sieger.add(wahlkreissieger);
 	   }
 	   return sieger;
    }
  
+   /** Q5: Überhangmandate */
+   /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
    public List<Ueberhangmandate> getUeberhangmandate() throws SQLException {
 	   List<Ueberhangmandate> mandate = new ArrayList<Ueberhangmandate>();
 	   List<Bundesland> bundeslaender = getAllBundeslaender();
@@ -226,7 +246,39 @@ import javax.sql.DataSource;
 	   return mandate;
    }
  
-   public List<Kandidat> getKnappsteSieger() {
+   /** Q6: Knappste Sieger */
+   /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
+   public List<KnappsterSieger> getKnappsteSieger() {
      return null;
    }
+   
+   /** Q7: Wahlkreisübersicht (Einzelstimmen) */
+   /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
+   public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(int id) {
+     List<Einzelergebnis<Partei, Integer>> stimmenAbsolut = new ArrayList<Einzelergebnis<Partei, Integer>>();
+     stimmenAbsolut.add(
+       new Einzelergebnis<Partei, Integer>(new Partei("CDU/CSU"), Integer.valueOf(2499)));
+     stimmenAbsolut.add(
+       new Einzelergebnis<Partei, Integer>(new Partei("FDP"), Integer.valueOf(367)));
+     stimmenAbsolut.add(
+       new Einzelergebnis<Partei, Integer>(new Partei("SPD"), Integer.valueOf(1499)));
+     List<Einzelergebnis<Partei, Double>> stimmenProzentual = new ArrayList<Einzelergebnis<Partei, Double>>();
+     stimmenProzentual.add(
+       new Einzelergebnis<Partei, Double>(new Partei("CDU/CSU"), Double.valueOf(49.399999999999999D)));
+     stimmenProzentual.add(
+       new Einzelergebnis<Partei, Double>(new Partei("FDP"), Double.valueOf(5.4D)));
+     stimmenProzentual.add(
+       new Einzelergebnis<Partei, Double>(new Partei("SPD"), Double.valueOf(35.200000000000003D)));
+     List<Einzelergebnis<Partei, Double>> stimmenEntwicklung = new ArrayList<Einzelergebnis<Partei, Double>>();
+     stimmenEntwicklung.add(
+       new Einzelergebnis<Partei, Double>(new Partei("CDU/CSU"), Double.valueOf(4.2D)));
+     stimmenEntwicklung.add(
+       new Einzelergebnis<Partei, Double>(new Partei("FDP"), Double.valueOf(1.3D)));
+     stimmenEntwicklung.add(
+       new Einzelergebnis<Partei, Double>(new Partei("SPD"), Double.valueOf(-4.7D)));
+     return new WahlkreisUebersicht(new Wahlkreis(id, "Testwahlkreis"), 
+       createKandidat("Aigner", "Ilse", "CSU", 224, "BY", 4), 68.700000000000003D, 
+       stimmenAbsolut, stimmenProzentual, stimmenEntwicklung);
+   }
+   
  }
