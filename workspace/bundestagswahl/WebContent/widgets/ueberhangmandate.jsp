@@ -1,3 +1,5 @@
+<%@page import="java.util.Map"%>
+<%@page import="java.util.HashMap"%>
 <%@page import="data.Bundesland"%>
 <%@page import="data.Partei"%>
 <%@page import="data.Einzelergebnis"%>
@@ -55,26 +57,31 @@
 
 <script type='text/javascript'>
 function drawMap() {
-    window.alert("Test1");
 	var data = new google.visualization.DataTable();
     data.addRows(<%= anzahlBl %>);
     data.addColumn('string', 'Kuerzel');
-    data.addColumn('number', 'Hauptstadt');
+    data.addColumn('number', '');
     data.addColumn('string', 'Bundeslandname');
     
 <%
+	Map<String, Integer> anzahlMandate = new HashMap<String, Integer>();
+	for (Ueberhangmandate mandat : mandate) {
+		anzahlMandate.put(mandat.getBundesland(), mandat.getMandate().size());
+	}
 	for (Bundesland bl : bundeslaender) {
 		int index = bundeslaender.indexOf(bl);
+		
 %>
     data.setValue(<%= index %>, 0, '<%= "DE-" + bl.getKuerzel() %>');
     data.setValue(<%= index %>, 1, 2);
-    data.setValue(<%= index %>, 2, '<%="Wadda" %>');
+    data.setValue(<%= index %>, 2, '<%= bl.getName() %>');
 <%
 	}
 %>
     var options = {};
     options['dataMode'] = 'regions';
     options['region'] = 'DE';
+    options['showLegend'] = false;
 
     var container = document.getElementById('map_canvas');
     var geomap = new google.visualization.GeoMap(container);
