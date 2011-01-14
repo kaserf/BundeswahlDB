@@ -9,6 +9,7 @@
 <script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="js/jquery-ui-1.8.7.custom.min.js"></script>
 <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+<script type='text/javascript' src='http://www.google.com/jsapi'></script>
 <script type="text/javascript">
 
 function loadWidget(name) {
@@ -28,6 +29,8 @@ $(function() {
 		});
 	});
 });
+
+google.load('visualization', '1', {'packages': ['geomap']});
 </script>
 
 <style>
@@ -89,6 +92,8 @@ html { overflow: -moz-scrollbars-vertical; overflow-x: auto; }
 <button name="mitglieder" class="navbutton">Mitglieder des Bundestages</button><br />
 <button name="wahlkreisuebersicht" class="navbutton">Wahlkreisübersicht</button><br />
 <button name="wahlkreissieger" class="navbutton">Wahlkreissieger</button><br />
+<button name="ueberhangmandate" class="navbutton">Überhangmandate</button><br />
+<button name="knappstesieger" class="navbutton">Top 10 der knappsten Sieger</button><br />
 </p>
 </div>
 

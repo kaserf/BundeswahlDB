@@ -6,9 +6,11 @@
  import data.Listenkandidatur;
  import data.Partei;
  import data.Sitzverteilung;
- import data.Ueberhangmandat;
+ import data.Ueberhangmandate;
  import data.Wahlkreis;
  import data.WahlkreisUebersicht;
+import data.Wahlkreissieger;
+
  import java.sql.Connection;
  import java.sql.ResultSet;
  import java.sql.SQLException;
@@ -197,9 +199,31 @@ import javax.sql.DataSource;
        createKandidat("Aigner", "Ilse", "CSU", 224, "BY", 4), 68.700000000000003D, 
        stimmenAbsolut, stimmenProzentual, stimmenEntwicklung);
    }
+   
+   public List<Wahlkreissieger> getWahlkreisSieger() {
+	   List<Wahlkreissieger> sieger = new ArrayList<Wahlkreissieger>();
+	   for (int i = 0; i < 299; i++) {
+		   Wahlkreissieger wahlkreissieger = new Wahlkreissieger(i, 
+				   new Einzelergebnis<Kandidat, Integer>(new Kandidat("Horst", "Schmidt", null, i, null), 85), 
+				   new Einzelergebnis<Partei, Integer>(new Partei("SPD"), 35));
+		   sieger.add(wahlkreissieger);
+	   }
+	   return sieger;
+   }
  
-   public Map<Bundesland, List<Ueberhangmandat>> getUeberhangmandate() {
-     return null;
+   public List<Ueberhangmandate> getUeberhangmandate() throws SQLException {
+	   List<Ueberhangmandate> mandate = new ArrayList<Ueberhangmandate>();
+	   List<Bundesland> bundeslaender = getAllBundeslaender();
+	   for (Bundesland bundesland : bundeslaender) {
+		   List<Einzelergebnis<Partei, Integer>> ergebnisse = new ArrayList<Einzelergebnis<Partei,Integer>>();
+		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("SPD"), 29));
+		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("FDP"), 5));
+		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("CDU"), 7));
+		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("Grüne"), 3));
+		   Ueberhangmandate mandat = new Ueberhangmandate(bundesland.getName(), ergebnisse);
+		   mandate.add(mandat);
+	   }
+	   return mandate;
    }
  
    public List<Kandidat> getKnappsteSieger() {
