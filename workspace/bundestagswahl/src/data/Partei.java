@@ -2,10 +2,16 @@
  
  public class Partei
  {
+   private int id;
    private String name;
  
-   public Partei(String name)
+   public Partei(String name) {
+	   setName(name);
+   }
+   
+   public Partei(int id, String name)
    {
+	 setId(id);
      setName(name);
    }
  
@@ -33,4 +39,12 @@
      return (obj != null) && (getClass().equals(obj.getClass())) && 
        (getName().equals(((Partei)obj).getName()));
    }
+
+public void setId(int id) {
+	this.id = id;
+}
+
+public int getId() {
+	return id;
+}
  }

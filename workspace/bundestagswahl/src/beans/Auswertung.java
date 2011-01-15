@@ -121,6 +121,42 @@ import javax.sql.DataSource;
      freeConnection();
      return kandidaten;
    }
+   
+   /** Helper method for jsps. */
+   public List<Partei> getAllParteien() throws SQLException {
+     initConnection();
+     Statement stmt = this.connection.createStatement();
+     List<Partei> parteien = new ArrayList<Partei>();
+     ResultSet result = stmt.executeQuery("SELECT * FROM partei");
+     while (result.next()) {
+       parteien.add(createPartei(result));
+     }
+     freeConnection();
+     return parteien;
+   }
+   
+   /** Creates a {@link Partei} object from a result set. */
+   private Partei createPartei(ResultSet result) throws SQLException {
+     String parteiName = result.getString("kurzbezeichnung");
+     int id = result.getInt("nummer");
+	 Partei partei = new Partei(id, parteiName);
+     return partei;
+   }
+   
+   /** Gets a {@link Partei} object from its id. Convenience method for jsps */
+   public Partei getPartei(int parteinr) throws SQLException {
+     initConnection();
+     Statement stmt = this.connection.createStatement();
+     ResultSet result = stmt
+       .executeQuery("SELECT * FROM partei WHERE nummer = " + 
+       parteinr);
+     Partei partei = null;
+     while (result.next()) {
+       partei = createPartei(result);
+     }
+     freeConnection();
+     return partei;
+   }
  
    /** Helper method for queries and jsps. */
    public List<Bundesland> getAllBundeslaender() throws SQLException {
@@ -250,7 +286,16 @@ import javax.sql.DataSource;
    /** Q6: Knappste Sieger */
    /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
    public List<KnappsterSieger> getKnappsteSieger() {
-     return null;
+	   List<KnappsterSieger> knappsteSieger = new ArrayList<KnappsterSieger>();
+	   for (int i = 0; i < 10; i++) {
+		   Einzelergebnis<Kandidat, Integer> sieger = new Einzelergebnis<Kandidat, Integer>(
+				   new Kandidat("Schmidt", "Horst", new Partei("SPD"), 5, null), 73);
+		   Einzelergebnis<Kandidat, Integer> verlierer = new Einzelergebnis<Kandidat, Integer>(
+				   new Kandidat("Müller", "Hans", new Partei("FDP"), 5, null), 71);
+		   KnappsterSieger knSieger = new KnappsterSieger("SPD", sieger, verlierer);
+		   knappsteSieger.add(knSieger);
+	   }
+	   return knappsteSieger;
    }
    
    /** Q7: Wahlkreisübersicht (Einzelstimmen) */
