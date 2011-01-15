@@ -323,7 +323,7 @@ import javax.sql.DataSource;
      stimmenEntwicklung.add(
        new Einzelergebnis<Partei, Double>(new Partei("SPD"), Double.valueOf(-4.7D)));
      return new WahlkreisUebersicht(new Wahlkreis(id, "Testwahlkreis"), 
-       createKandidat("Aigner", "Ilse", "CSU", 224, "BY", 4), 68.700000000000003D, 
+       createKandidat("Köhler", "Horst", "CSU", 224, "BY", 4), 68.700000000000003D, 
        stimmenAbsolut, stimmenProzentual, stimmenEntwicklung);
    }
    

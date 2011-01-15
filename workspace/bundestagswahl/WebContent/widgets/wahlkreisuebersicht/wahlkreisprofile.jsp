@@ -23,8 +23,15 @@
     pageEncoding="UTF-8"%>
 <%
 	int id = Integer.parseInt(request.getParameter("wahlkreis"));
+	boolean live = Boolean.parseBoolean(request.getParameter("live"));
 	Auswertung auswertung = new Auswertung();
-	WahlkreisUebersicht uebersicht = auswertung.getWahlkreisUebersicht(id);
+	WahlkreisUebersicht uebersicht;
+	if(live) {
+		uebersicht = auswertung.getWahlkreisUebersichtEinzelstimmen(id);
+	}
+	else {
+		uebersicht = auswertung.getWahlkreisUebersicht(id);
+	}
 	Kandidat kandidat = uebersicht.getDirektkandidat();
 %>
 <h2>Ergebnisse für Wahlkreis: <%= request.getParameter("wahlkreis") + " - " + uebersicht.getWahlkreis().getName() %></h2>

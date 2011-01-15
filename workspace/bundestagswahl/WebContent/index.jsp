@@ -11,26 +11,26 @@
 <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
 <script type="text/javascript">
-
-function loadWidget(name) {
-	$('#content').fadeOut('normal', function() {
-		$('#content').load('widgets/' + name + '.jsp', function() {
-			$('#content').fadeIn('slow');
-		});	
-	});
-}
-
-$(function() {
-	$('.navbutton').each(function(index) {
-		$(this).button();
-		var name = $(this).attr('name');
-		$(this).click(function() {
-			loadWidget(name);
+	
+	$(function() {
+		$('#menu').buttonset();
+		$('[name="selectRadio"]').each(function(index) {
+			var id = $(this).attr('id');
+			$(this).click(function() {
+				loadWidget(id);
+			});
 		});
 	});
-});
-
-google.load('visualization', '1', {'packages': ['geomap']});
+	
+	function loadWidget(name) {
+		$('#content').fadeOut('normal', function() {
+			$('#content').load('widgets/' + name + '.jsp', function() {
+				$('#content').fadeIn('slow');
+			});	
+		});
+	}
+	
+	google.load('visualization', '1', {'packages': ['geomap']});
 </script>
 
 <style>
@@ -57,12 +57,12 @@ body {
 	width: 200px;
 }
 
-.navbutton {
-	width: 200px;
-}
-
 .centered {
 	text-align: center;
+}
+
+label {
+	width: 200px;
 }
 
 html { overflow: -moz-scrollbars-vertical; overflow-x: auto; }
@@ -76,30 +76,37 @@ html { overflow: -moz-scrollbars-vertical; overflow-x: auto; }
 <div id="wrapper">
 
 <div id="container">
-<div id="content">
-<h2>Ergebnisse der Bundestagswahl</h2>
-<object width="480" height="385">
-		<param name="movie" value="http://www.youtube.com/v/KmYKKVuEv5s?fs=1&amp;hl=de_DE"></param>
-		<param name="allowFullScreen" value="true"></param>
-		<param name="allowscriptaccess" value="always"></param>
-		<embed src="http://www.youtube.com/v/KmYKKVuEv5s?fs=1&amp;hl=de_DE" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed>
-</object>
-</div>
+	<div id="content">
+	<h2>Ergebnisse der Bundestagswahl</h2>
+	<object width="480" height="385">
+			<param name="movie" value="http://www.youtube.com/v/KmYKKVuEv5s?fs=1&amp;hl=de_DE"></param>
+			<param name="allowFullScreen" value="true"></param>
+			<param name="allowscriptaccess" value="always"></param>
+			<embed src="http://www.youtube.com/v/KmYKKVuEv5s?fs=1&amp;hl=de_DE" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed>
+	</object>
+	</div>
 
-<div id="menu">
-<p>
-<button name="sitzverteilung" class="navbutton">Sitzverteilung</button><br />
-<button name="mitglieder" class="navbutton">Mitglieder des Bundestages</button><br />
-<button name="wahlkreisuebersicht" class="navbutton">Wahlkreisübersicht</button><br />
-<button name="wahlkreissieger" class="navbutton">Wahlkreissieger</button><br />
-<button name="ueberhangmandate" class="navbutton">Überhangmandate</button><br />
-<button name="knappstesieger" class="navbutton">Top 10 der knappsten Sieger</button><br />
-</p>
-</div>
+	<div id="menu">
+		<p>
+		<input type="radio" name="selectRadio" id="sitzverteilung" value="0"  />
+			<label for="sitzverteilung">Sitzverteilung</label><br />
+		<input type="radio" name="selectRadio" id="mitglieder" value="1"  />
+			<label for="mitglieder">Mitglieder des Bundestages</label><br />
+		<input type="radio" name="selectRadio" id="wahlkreisuebersicht" value="2"  />
+			<label for="wahlkreisuebersicht">Wahlkreisübersicht</label><br />
+		<input type="radio" name="selectRadio" id="wahlkreissieger" value="3"  />
+			<label for="wahlkreissieger">Wahlkreissieger</label><br />
+		<input type="radio" name="selectRadio" id="ueberhangmandate" value="4"  />
+			<label for="ueberhangmandate">Überhangmandate</label><br />
+		<input type="radio" name="selectRadio" id="knappstesieger" value="5"  />
+			<label for="knappstesieger">Top 10 der knappsten Sieger</label><br />
+		</p>
+	</div>
 
 </div>
 
 </div>
 
 </body>
+
 </html>
