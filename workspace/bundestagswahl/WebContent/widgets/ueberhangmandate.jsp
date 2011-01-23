@@ -61,7 +61,8 @@
 	    		var row = geomap.getSelection()[0].row;
 	    		var selectedBl = data.getValue(row, 0);
 	    		$('#mandate').fadeOut(function() {
-	    			$('#mandate').load('widgets/ueberhangmandattabelle.jsp?bundesland=' + selectedBl, function() {
+	    			$('#mandate').load('widgets/ueberhangmandate/ueberhangmandattabelle.jsp?bundesland=' 
+	    					+ selectedBl, function() {
 						$('#mandate').fadeIn();
 					});
 	    		});

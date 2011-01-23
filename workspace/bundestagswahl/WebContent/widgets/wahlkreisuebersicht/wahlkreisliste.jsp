@@ -16,25 +16,41 @@ for (Wahlkreis w : wahlkreise) {
 	i++; 
 } %>
 <script>
+var fragments = getFragments();
+if (fragments.length >= 4) {
+	var wahlkreis = fragments[4];
+	$('#chooserDisplay').hide();
+	$('#wahlkreisProfile').load('widgets/wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=' 
+			+ id + "&live=" + live, function() {
+		$('#wahlkreisProfile').fadeIn();
+	});
+	var bundeslandName = $('[for="bundeslandRadio'+bundesland+'"]').text();
+	$('#bundeslandDisplay').html(bundeslandName);
+	$('#wahlkreisnummerDisplay').html(id);
+}
+
 $('#wahlkreisChooser').buttonset();
 $('[for^="wahlkreisRadio"]').each(function(index) {
 	$(this).css("width", "350px");
 	$(this).css("text-align", "left");
 });
 $('[name="wahlkreisRadio"]').each(function(index) {
-	var name = $(this).attr('value');
-	$(this).click(function() {
-		$('#selectedDisplay').slideDown(function() {
-			$('#wahlkreisProfile').fadeOut(function() {
-				$('#wahlkreisProfile').load('widgets/wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=' + name + "&live=" + live, function() {
-					$('#wahlkreisProfile').fadeIn();
-				});
-			});	
-		});
-		$('#chooserDisplay').slideUp();
-		$('#bundeslandDisplay').html('<%= auswertung.getBundesland(bundesland).getName() %>');
-		$('#wahlkreisnummerDisplay').html(name);
-	});
+	var id = $(this).attr('value');
+	$(this).click(loadProfile(id));
 });
+
+function loadProfile(id) {
+	$('#selectedDisplay').slideDown(function() {
+		$('#wahlkreisProfile').fadeOut(function() {
+			$('#wahlkreisProfile').load('widgets/wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=' 
+					+ id + "&live=" + live, function() {
+				$('#wahlkreisProfile').fadeIn();
+			});
+		});
+	});
+	$('#chooserDisplay').slideUp();
+	$('#bundeslandDisplay').html('<%= auswertung.getBundesland(bundesland).getName() %>');
+	$('#wahlkreisnummerDisplay').html(id);
+}
 </script>
 
