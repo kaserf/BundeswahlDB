@@ -20,6 +20,7 @@ import data.Wahlkreissieger;
  import java.util.HashMap;
  import java.util.List;
  import java.util.Map;
+
  import javax.naming.Context;
  import javax.naming.InitialContext;
  import javax.naming.NamingException;
@@ -215,42 +216,65 @@ import javax.sql.DataSource;
      return bundesland;
    }
  
-   /** Q3: Wahlkreisübersicht */
-   /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
-   public WahlkreisUebersicht getWahlkreisUebersicht(int id) {
-     List<Einzelergebnis<Partei, Integer>> stimmenAbsolut = new ArrayList<Einzelergebnis<Partei, Integer>>();
-     stimmenAbsolut.add(
-       new Einzelergebnis<Partei, Integer>(new Partei("CDU/CSU"), Integer.valueOf(2499)));
-     stimmenAbsolut.add(
-       new Einzelergebnis<Partei, Integer>(new Partei("FDP"), Integer.valueOf(367)));
-     stimmenAbsolut.add(
-       new Einzelergebnis<Partei, Integer>(new Partei("SPD"), Integer.valueOf(1499)));
-     List<Einzelergebnis<Partei, Double>> stimmenProzentual = new ArrayList<Einzelergebnis<Partei, Double>>();
-     stimmenProzentual.add(
-       new Einzelergebnis<Partei, Double>(new Partei("CDU/CSU"), Double.valueOf(49.399999999999999D)));
-     stimmenProzentual.add(
-       new Einzelergebnis<Partei, Double>(new Partei("FDP"), Double.valueOf(5.4D)));
-     stimmenProzentual.add(
-       new Einzelergebnis<Partei, Double>(new Partei("SPD"), Double.valueOf(35.200000000000003D)));
-     List<Einzelergebnis<Partei, Double>> stimmenEntwicklung = new ArrayList<Einzelergebnis<Partei, Double>>();
-     stimmenEntwicklung.add(
-       new Einzelergebnis<Partei, Double>(new Partei("CDU/CSU"), Double.valueOf(4.2D)));
-     stimmenEntwicklung.add(
-       new Einzelergebnis<Partei, Double>(new Partei("FDP"), Double.valueOf(1.3D)));
-     stimmenEntwicklung.add(
-       new Einzelergebnis<Partei, Double>(new Partei("SPD"), Double.valueOf(-4.7D)));
-     return new WahlkreisUebersicht(new Wahlkreis(id, "Testwahlkreis"), 
-       createKandidat("Aigner", "Ilse", "CSU", 224, "BY", 4), 68.700000000000003D, 
-       stimmenAbsolut, stimmenProzentual, stimmenEntwicklung);
+   /** Q3: Wahlkreisï¿½bersicht */
+   /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) 
+ * @throws SQLException */
+   public WahlkreisUebersicht getWahlkreisUebersicht(int id) throws SQLException {
+	   initConnection();
+	   double wahlbeteiligung;
+	   String wk_name;
+	   List<Einzelergebnis<Partei, Integer>> stimmenAbsolut = new ArrayList<Einzelergebnis<Partei, Integer>>();
+	   List<Einzelergebnis<Partei, Double>> stimmenEntwicklung = new ArrayList<Einzelergebnis<Partei, Double>>();
+	   List<Einzelergebnis<Partei, Double>> stimmenProzentual = new ArrayList<Einzelergebnis<Partei, Double>>();
+	   Statement stmt = this.connection.createStatement();
+	   ResultSet result = stmt.executeQuery("SELECT CAST(waehler AS float)/wahlberechtigte FROM struktur WHERE wahlkreis = " + id + " AND jahr = 2009");
+	   result.next();
+	   wahlbeteiligung = result.getDouble(1);
+
+	   result = stmt.executeQuery("SELECT name FROM wahlkreis WHERE nummer = " + id);
+	   result.next();
+	   wk_name = result.getString(1);
+
+	   result = stmt.executeQuery("with gesamt09 as (select gueltig_zweit as gesamt from struktur where wahlkreis = " + id + " and jahr = 2009), " +
+	   		"gesamt05 as (select gueltig_zweit as gesamt from struktur where wahlkreis = " + id + " and jahr = 2005), " +
+	   				"old_prozente as (select l2.partei, cast(l2.stimmenanzahl as float)/gesamt05.gesamt as vor_stimmen " +
+	   				"from gesamt05, listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2005 and w2.wahlkreis = " +id + "), " +
+	   						"new_prozente as (select l2.partei, cast(l2.stimmenanzahl as float)/gesamt09.gesamt as vor_stimmen " +
+	   						"from gesamt09, listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2009 and w2.wahlkreis = " + id + ") " +
+	   								"select p.kurzbezeichnung, lw.stimmenanzahl as stimmen, old_prozente.vor_stimmen * 100 as prozente_old, " +
+	   								"new_prozente.vor_stimmen * 100 as prozente_new, (new_prozente.vor_stimmen - old_prozente.vor_stimmen) * 100 as prozente_diff " +
+	   								"from (listenergebnis l join wahlergebnis w on l.wahlergebnis = w.id) lw join partei p on lw.partei = p.nummer, old_prozente, " +
+	   								"new_prozente where lw.wahljahr = 2009 and lw.wahlkreis = " + id + " and old_prozente.partei = lw.partei and " +
+	   										"new_prozente.partei = lw.partei");
+	   while (result.next()) {
+		   //TODO: sum liste + direkt stimmen? prozente berechnen, entwicklung berechnen
+		   stimmenAbsolut.add(new Einzelergebnis<Partei, Integer>(new Partei(result.getString(1)), Integer.valueOf(result.getInt(2))));
+		   stimmenProzentual.add(new Einzelergebnis<Partei, Double>(new Partei(result.getString(1)), Double.valueOf(result.getDouble(4))));
+		   stimmenEntwicklung.add(new Einzelergebnis<Partei, Double>(new Partei(result.getString(1)), Double.valueOf(result.getDouble(5))));
+	   }
+
+	   result = stmt.executeQuery("WITH wdk as (SELECT * FROM ((wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd" +
+	   		" JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer) wdk WHERE wdk.wahljahr = 2009 AND wdk.wahlkreis = " + id + ")" +
+	   		" SELECT wdk.vorname, wdk.nachname, wdk.kurzbezeichnung" +
+	   		" FROM wdk WHERE wdk.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk)");
+	   result.next();
+
+	   String vorname = result.getString(1);
+	   String nachname = result.getString(2);
+	   String partei = result.getString(3);
+
+	   WahlkreisUebersicht ret = new WahlkreisUebersicht(new Wahlkreis(id, wk_name), createKandidat(nachname, vorname, partei),
+			   wahlbeteiligung, stimmenAbsolut, stimmenProzentual, stimmenEntwicklung);
+
+	   freeConnection();
+	   return ret;
    }
    
    /** Convenience method for stubbing. */
-   private Kandidat createKandidat(String nachname, String vorname, String partei, int wkr, String bundesland, int platz)
+   private Kandidat createKandidat(String nachname, String vorname, String partei)
    {
-     Listenkandidatur kandidatur = new Listenkandidatur(
-       new Bundesland(bundesland, null), platz);
-     return new Kandidat(nachname, vorname, new Partei(partei), wkr, 
-       kandidatur);
+     return new Kandidat(nachname, vorname, new Partei(partei), 0, 
+       null);
    }
    
    /** Q4: Wahlkreissieger */
@@ -266,7 +290,7 @@ import javax.sql.DataSource;
 	   return sieger;
    }
  
-   /** Q5: Überhangmandate */
+   /** Q5: ï¿½berhangmandate */
    /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
    public List<Ueberhangmandate> getUeberhangmandate() throws SQLException {
 	   List<Ueberhangmandate> mandate = new ArrayList<Ueberhangmandate>();
@@ -276,7 +300,7 @@ import javax.sql.DataSource;
 		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("SPD"), 29));
 		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("FDP"), 5));
 		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("CDU"), 7));
-		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("Grüne"), 3));
+		   ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei("Grï¿½ne"), 3));
 		   Ueberhangmandate mandat = new Ueberhangmandate(bundesland, ergebnisse);
 		   mandate.add(mandat);
 	   }
@@ -291,14 +315,14 @@ import javax.sql.DataSource;
 		   Einzelergebnis<Kandidat, Integer> sieger = new Einzelergebnis<Kandidat, Integer>(
 				   new Kandidat("Schmidt", "Horst", new Partei("SPD"), 5, null), 73);
 		   Einzelergebnis<Kandidat, Integer> verlierer = new Einzelergebnis<Kandidat, Integer>(
-				   new Kandidat("Müller", "Hans", new Partei("FDP"), 5, null), 71);
+				   new Kandidat("Mï¿½ller", "Hans", new Partei("FDP"), 5, null), 71);
 		   KnappsterSieger knSieger = new KnappsterSieger("SPD", sieger, verlierer);
 		   knappsteSieger.add(knSieger);
 	   }
 	   return knappsteSieger;
    }
    
-   /** Q7: Wahlkreisübersicht (Einzelstimmen) */
+   /** Q7: Wahlkreisï¿½bersicht (Einzelstimmen) */
    /** TODO: Implement Query in SQL; don't forget initConnection() and freeConnection() :) */
    public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(int id) {
      List<Einzelergebnis<Partei, Integer>> stimmenAbsolut = new ArrayList<Einzelergebnis<Partei, Integer>>();
@@ -323,7 +347,7 @@ import javax.sql.DataSource;
      stimmenEntwicklung.add(
        new Einzelergebnis<Partei, Double>(new Partei("SPD"), Double.valueOf(-4.7D)));
      return new WahlkreisUebersicht(new Wahlkreis(id, "Testwahlkreis"), 
-       createKandidat("Köhler", "Horst", "CSU", 224, "BY", 4), 68.700000000000003D, 
+       createKandidat("Kï¿½hler", "Horst", "CSU"), 68.700000000000003D, 
        stimmenAbsolut, stimmenProzentual, stimmenEntwicklung);
    }
    

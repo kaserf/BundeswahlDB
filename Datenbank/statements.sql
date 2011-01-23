@@ -1,4 +1,20 @@
---wahlbeteiligung für einen wahlkreis
+--wahlausgang für einen wahlkreis (aggregierte berechnung)
+with
+gesamt09 as 
+(select gueltig_zweit as gesamt from struktur where wahlkreis = 55 and jahr = 2009),
+gesamt05 as 
+(select gueltig_zweit as gesamt from struktur where wahlkreis = 55 and jahr = 2005), 
+old_prozente as 
+(select l2.partei, cast(l2.stimmenanzahl as float)/gesamt05.gesamt as vor_stimmen from gesamt05, listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2005 and w2.wahlkreis = 55), 
+new_prozente as 
+(select l2.partei, cast(l2.stimmenanzahl as float)/gesamt09.gesamt as vor_stimmen from gesamt09, listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2009 and w2.wahlkreis = 55)
+select p.kurzbezeichnung, lw.stimmenanzahl as stimmen, old_prozente.vor_stimmen * 100 as prozente_old, new_prozente.vor_stimmen * 100 as prozente_new, (new_prozente.vor_stimmen - old_prozente.vor_stimmen) * 100 as prozente_diff from (listenergebnis l join wahlergebnis w on l.wahlergebnis = w.id) lw join partei p on lw.partei = p.nummer, old_prozente, new_prozente where lw.wahljahr = 2009 and lw.wahlkreis = 55 and old_prozente.partei = lw.partei and new_prozente.partei = lw.partei;
+
+--direktkandidat aggregiert
+WITH wdk as (SELECT * FROM ((wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer) wdk WHERE wdk.wahljahr = 2009 AND wdk.wahlkreis = 55)
+SELECT wdk.vorname, wdk.nachname, wdk.kurzbezeichnung FROM wdk WHERE wdk.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk);
+
+--wahlbeteiligung für einen wahlkreis (direktberechnung, ohne aggregate)
 --wk 55 liegt in bremen
 SELECT 55 as Wahlkreis, (CAST (anz_gew as float)/anz_ber) * 100 as Beteiligung
   FROM (SELECT COUNT(*) as anz_gew FROM Wahlberechtigte WHERE gewaehlt = true AND wahlkreis = 55)
