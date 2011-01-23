@@ -11,26 +11,70 @@
 <script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
 <script type="text/javascript">
-	
-	$(function() {
-		$('#menu').buttonset();
-		$('[name="selectRadio"]').each(function(index) {
-			var id = $(this).attr('id');
-			$(this).click(function() {
-				loadWidget(id);
-			});
-		});
-	});
-	
-	function loadWidget(name) {
-		$('#content').fadeOut('normal', function() {
-			$('#content').load('widgets/' + name + '.jsp', function() {
-				$('#content').fadeIn('slow');
-			});	
-		});
+
+var loading = true;
+
+function getFragments() {
+	var fString = document.location.hash.substring(1);
+	while (fString.substr(fString.length - 1) == "/") {
+		fString = fString.substr(0, fString.length - 1);
 	}
-	
-	google.load('visualization', '1', {'packages': ['geomap']});
+	document.location.hash = fString;
+	return fString.split("/");
+}
+
+
+function processUrl() {
+	var fragments = getFragments();
+	if (fragments.length > 0) {
+		loadWidget(fragments[0]);
+		$('[for="' + fragments[0] + '"]').addClass('ui-state-active');
+	}
+}
+
+function setUrlFragment(fragment, text) {
+	var fragments = getFragments();
+	var arr = [];
+	if (fragment > fragments.length + 1) {
+		window.alert("Fragment not available");
+	}
+	var i = 0;
+	for (i = 0; i < fragment; i++) {
+		arr.push(fragments[i]);
+	}
+	arr.push(text);
+	i++;
+	if (loading) {
+		while (i < fragments.length) {
+			arr.push(fragments[i]);
+			i++;
+		}
+	}
+	document.location.hash = '#' + arr.join('/');
+}
+
+$(function() {
+	$('#menu').buttonset();
+	$('[name="selectRadio"]').each(function(index) {
+		var id = $(this).attr('id');
+		$(this).click(function() {
+			loadWidget(id);
+		});
+	});	
+	processUrl();
+	loading = false;
+});
+
+function loadWidget(name) {
+	$('#content').fadeOut('normal', function() {
+		$('#content').load('widgets/' + name + '.jsp', function() {
+			$('#content').fadeIn('slow');
+		});	
+	});
+	setUrlFragment(0, name);
+}
+
+google.load('visualization', '1', {'packages': ['geomap']});
 </script>
 
 <style>
