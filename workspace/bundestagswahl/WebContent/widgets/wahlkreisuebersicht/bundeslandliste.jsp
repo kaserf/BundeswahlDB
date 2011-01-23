@@ -16,12 +16,6 @@ for (Bundesland b : bundeslaender) {
 } 
 %>
 <script>
-var fragments = getFragments();
-if (fragments.length >= 3) {
-	var bundesland = fragments[3];
-	window.alert(bundesland);
-	$('#wahlkreisChooser').load('widgets/wahlkreisuebersicht/wahlkreisliste.jsp?bundesland=' + bundesland);
-}
 
 $('#bundeslandChooser').buttonset();
 $('[for^="bundeslandRadio"]').each(function(index) {

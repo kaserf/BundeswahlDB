@@ -16,19 +16,6 @@ for (Wahlkreis w : wahlkreise) {
 	i++; 
 } %>
 <script>
-var fragments = getFragments();
-if (fragments.length >= 4) {
-	var wahlkreis = fragments[4];
-	$('#chooserDisplay').hide();
-	$('#wahlkreisProfile').load('widgets/wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=' 
-			+ id + "&live=" + live, function() {
-		$('#wahlkreisProfile').fadeIn();
-	});
-	var bundeslandName = $('[for="bundeslandRadio'+bundesland+'"]').text();
-	$('#bundeslandDisplay').html(bundeslandName);
-	$('#wahlkreisnummerDisplay').html(id);
-}
-
 $('#wahlkreisChooser').buttonset();
 $('[for^="wahlkreisRadio"]').each(function(index) {
 	$(this).css("width", "350px");

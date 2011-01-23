@@ -1,14 +1,18 @@
  package data;
  
  import java.util.List;
+
+import javax.xml.bind.annotation.XmlRootElement;
  
+ @XmlRootElement
  public class Bundesland
  {
    private String name;
    private Integer nummer;
    private String kuerzel;
    private List<Wahlkreis> wahlkreise;
- 
+
+   
    public Bundesland(String name, List<Wahlkreis> wahlkreise)
    {
      setName(name);

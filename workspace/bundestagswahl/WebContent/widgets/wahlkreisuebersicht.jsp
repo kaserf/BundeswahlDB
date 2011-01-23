@@ -32,13 +32,11 @@ function loadLive() {
    	live = true;
 	$(this).dialog('close');
 	$('#bundeslandChooser').load("widgets/wahlkreisuebersicht/bundeslandliste.jsp");
-	setUrlFragment(1, "live");
 }
 
 function loadAggr() {
 	$(this).dialog('close');
 	$('#bundeslandChooser').load("widgets/wahlkreisuebersicht/bundeslandliste.jsp");
-	setUrlFragment(1, "aggr");
 }
 
 $("#dialog").dialog({
@@ -49,18 +47,6 @@ $("#dialog").dialog({
    		Nein: loadAggr
    	}
 });
-
-var fragments = getFragments();
-if (fragments.length >= 2) {
-	var lv = fragments[2];
-	if (lv == "live") {
-		loadLive();
-	} else {
-		loadAggr();
-	}
-} else {
-	$("#dialog").dialog('open');
-}
 
 $('#selectedDisplay').button();
 $('#selectedDisplay').click(function() {

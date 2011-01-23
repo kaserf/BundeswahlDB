@@ -1,24 +1,35 @@
 package data;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Wahlkreissieger {
 	private int wahlkreisNr;
 	private Einzelergebnis<Kandidat, Integer> erstStimmenSieger;
 	private Einzelergebnis<Partei, Integer> zweitStimmenSieger;
-	
-	public Wahlkreissieger(int wahlkreisNr, Einzelergebnis<Kandidat, Integer> erstStimmenSieger, Einzelergebnis<Partei, Integer> zweitStimmenSieger) {
+
+	public Wahlkreissieger() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Wahlkreissieger(int wahlkreisNr,
+			Einzelergebnis<Kandidat, Integer> erstStimmenSieger,
+			Einzelergebnis<Partei, Integer> zweitStimmenSieger) {
 		setWahlkreisNr(wahlkreisNr);
 		setErstStimmenSieger(erstStimmenSieger);
 		setZweitStimmenSieger(zweitStimmenSieger);
 	}
-	
+
 	public void setWahlkreisNr(int wahlkreisNr) {
 		this.wahlkreisNr = wahlkreisNr;
 	}
+
 	public int getWahlkreisNr() {
 		return wahlkreisNr;
 	}
 
-	public void setErstStimmenSieger(Einzelergebnis<Kandidat, Integer> erstStimmenSieger) {
+	public void setErstStimmenSieger(
+			Einzelergebnis<Kandidat, Integer> erstStimmenSieger) {
 		this.erstStimmenSieger = erstStimmenSieger;
 	}
 
@@ -26,7 +37,8 @@ public class Wahlkreissieger {
 		return erstStimmenSieger;
 	}
 
-	public void setZweitStimmenSieger(Einzelergebnis<Partei, Integer> zweitStimmenSieger) {
+	public void setZweitStimmenSieger(
+			Einzelergebnis<Partei, Integer> zweitStimmenSieger) {
 		this.zweitStimmenSieger = zweitStimmenSieger;
 	}
 

@@ -1,9 +1,16 @@
 package data;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class KnappsterSieger {
 	private String partei;
 	private Einzelergebnis<Kandidat, Integer> sieger;
 	private Einzelergebnis<Kandidat, Integer> verlierer;
+	
+	public KnappsterSieger() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	public KnappsterSieger(String partei, Einzelergebnis<Kandidat, Integer> sieger, Einzelergebnis<Kandidat, Integer> verlierer) {
 		setPartei(partei);

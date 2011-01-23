@@ -12,47 +12,6 @@
 <script type='text/javascript' src='http://www.google.com/jsapi'></script>
 <script type="text/javascript">
 
-var loading = true;
-
-function getFragments() {
-	var fString = document.location.hash.substring(1);
-	while (fString.substr(fString.length - 1) == "/") {
-		fString = fString.substr(0, fString.length - 1);
-	}
-	document.location.hash = fString;
-	return fString.split("/");
-}
-
-
-function processUrl() {
-	var fragments = getFragments();
-	if (fragments.length > 0) {
-		loadWidget(fragments[0]);
-		$('[for="' + fragments[0] + '"]').addClass('ui-state-active');
-	}
-}
-
-function setUrlFragment(fragment, text) {
-	var fragments = getFragments();
-	var arr = [];
-	if (fragment > fragments.length + 1) {
-		window.alert("Fragment not available");
-	}
-	var i = 0;
-	for (i = 0; i < fragment; i++) {
-		arr.push(fragments[i]);
-	}
-	arr.push(text);
-	i++;
-	if (loading) {
-		while (i < fragments.length) {
-			arr.push(fragments[i]);
-			i++;
-		}
-	}
-	document.location.hash = '#' + arr.join('/');
-}
-
 $(function() {
 	$('#menu').buttonset();
 	$('[name="selectRadio"]').each(function(index) {
@@ -61,8 +20,6 @@ $(function() {
 			loadWidget(id);
 		});
 	});	
-	processUrl();
-	loading = false;
 });
 
 function loadWidget(name) {
@@ -71,7 +28,6 @@ function loadWidget(name) {
 			$('#content').fadeIn('slow');
 		});	
 	});
-	setUrlFragment(0, name);
 }
 
 google.load('visualization', '1', {'packages': ['geomap']});
@@ -144,6 +100,8 @@ html { overflow: -moz-scrollbars-vertical; overflow-x: auto; }
 			<label for="ueberhangmandate">Überhangmandate</label><br />
 		<input type="radio" name="selectRadio" id="knappstesieger" value="5"  />
 			<label for="knappstesieger">Top 10 der knappsten Sieger</label><br />
+		<input type="radio" name="selectRadio" id="stimmenabgabe" value="5"  />
+			<label for="stimmenabgabe">Online Stimmenabgabe</label><br />
 		</p>
 	</div>
 
