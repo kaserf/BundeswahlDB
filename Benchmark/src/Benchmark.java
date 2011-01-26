@@ -13,25 +13,31 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Benchmark {
 	static final int DELAY = 1000;
-	static final int WORKERS = 40;
-	
-	public static void main (String[] args) {
+	static final int WORKERS = 50;
+	static final String FILE_PATH = "C:\\Users\\Eva\\Uni\\WS 1011\\Datenbanken\\BundeswahlDB\\Benchmark\\Results\\result-"
+			+ System.currentTimeMillis() + ".csv";
+	static final int MULTIPLIER = 20;
+
+	public static void main(String[] args) {
 		// start log queue
 		BlockingQueue<LogEntry> logQueue = new LinkedBlockingQueue<LogEntry>();
-		LogSaver logSaver = new LogSaver(logQueue);
+		LogSaver logSaver = new LogSaver(logQueue, FILE_PATH,
+				new CSVFormatter());
 		Thread logThread = new Thread(logSaver);
 		logThread.start();
-		
+
 		// create CardDeck
 		Map<String, Integer> urlQuantityMap = new HashMap<String, Integer>();
-		urlQuantityMap.put("http://localhost/Q1.html", 25);
-		urlQuantityMap.put("http://localhost/Q2.html", 10);
-		urlQuantityMap.put("http://localhost/Q3.html", 25);
-		urlQuantityMap.put("http://localhost/Q4.html", 10);
-		urlQuantityMap.put("http://localhost/Q5.html", 10);
-		urlQuantityMap.put("http://localhost/Q6.html", 20);
-		CardDeck cardDeck = new CardDeck(urlQuantityMap);
-		
+		urlQuantityMap.put("sitzverteilung.jsp", 25);
+		urlQuantityMap.put("mitglieder.jsp", 10);
+		urlQuantityMap.put(
+				"wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=24", 25);
+		// urlQuantityMap.put("wahlkreissieger.jsp", 10);
+		urlQuantityMap.put(
+				"ueberhangmandate/ueberhangmandattabelle.jsp?bundesland=1", 10);
+		// urlQuantityMap.put("knappstesieger/top10.jsp?partei=3", 20);
+		CardDeck cardDeck = new CardDeck(urlQuantityMap, MULTIPLIER);
+
 		// start card queue
 		BlockingQueue<Card> cardQueue = new LinkedBlockingQueue<Card>();
 		cardQueue.addAll(cardDeck.getCards());
@@ -42,7 +48,7 @@ public class Benchmark {
 			Thread urlThread = new Thread(urlWorker);
 			urlThread.start();
 		}
-		
+
 		while (!cardQueue.isEmpty()) {
 			try {
 				Thread.sleep(DELAY);
@@ -50,7 +56,7 @@ public class Benchmark {
 				e.printStackTrace();
 			}
 		}
-		
+
 		for (UrlWorker worker : threadPool) {
 			worker.setStop(true);
 		}

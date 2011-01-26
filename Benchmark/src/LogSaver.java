@@ -20,20 +20,30 @@ public class LogSaver implements Runnable {
 	/** Indicates whether thread is stopped. */
 	private boolean stop = false;
 
-	/** Constructor. */
-	public LogSaver(BlockingQueue<LogEntry> entryQueue, String filename) {
+	private LogEntryFormatter formatter;
+
+	public LogSaver(BlockingQueue<LogEntry> entryQueue, String filename,
+			LogEntryFormatter formatter) {
 		this.entryQueue = entryQueue;
 		try {
 			printWriter = new PrintStream(new File(filename));
 		} catch (FileNotFoundException e) {
+			System.out.println("File not found. Using System.out");
 			printWriter = System.out;
 		}
+		this.formatter = formatter;
+	}
+
+	/** Constructor. */
+	public LogSaver(BlockingQueue<LogEntry> entryQueue, String filename) {
+		this(entryQueue, filename, new TextFormatter());
 	}
 
 	/** Constructor with writing to the console. */
 	public LogSaver(BlockingQueue<LogEntry> entryQueue) {
 		this.entryQueue = entryQueue;
 		printWriter = System.out;
+		this.formatter = new TextFormatter();
 	}
 
 	/** Sets stop. */
@@ -43,17 +53,20 @@ public class LogSaver implements Runnable {
 
 	/** Performs the actual writing of log entries to the log file. */
 	private void doRun() throws Exception {
+		printWriter.println(formatter.getHeadLine());
 		while (!stop) {
 			LogEntry entry = entryQueue.poll(1, TimeUnit.SECONDS);
 			if (entry != null) {
-				printWriter.println(entry);
+				printWriter.println(formatter.format(entry));
+				System.out.println(formatter.format(entry));
 			}
 		}
 		synchronized (entryQueue) {
 			while (!entryQueue.isEmpty()) {
 				LogEntry entry = entryQueue.poll();
 				if (entry != null) {
-					printWriter.println(entry);
+					printWriter.println(formatter.format(entry));
+					System.out.println(formatter.format(entry));
 				}
 			}
 		}
