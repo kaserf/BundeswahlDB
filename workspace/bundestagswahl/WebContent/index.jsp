@@ -103,6 +103,9 @@ html { overflow: -moz-scrollbars-vertical; overflow-x: auto; }
 		<input type="radio" name="selectRadio" id="stimmenabgabe" value="5"  />
 			<label for="stimmenabgabe">Online Stimmenabgabe</label><br />
 		</p>
+		<div id="benchmarkResults">
+		results
+		</div>
 	</div>
 
 </div>
