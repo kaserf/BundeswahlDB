@@ -6,6 +6,8 @@
 	Auswertung auswertung = new Auswertung();
 	int kandidatId = Integer.parseInt(request.getParameter("kandidatId"));
 	int parteiId = Integer.parseInt(request.getParameter("parteiId"));
-	auswertung.setWahlzettel(kandidatId, parteiId, "hash");
+	int persnr = Integer.parseInt(request.getParameter("persNr"));
+	auswertung.setGewaehlt(persnr);
+	auswertung.setWahlzettel(kandidatId, parteiId);
 %>
 <h3>Danke für Ihre Stimmabgabe!</h3>

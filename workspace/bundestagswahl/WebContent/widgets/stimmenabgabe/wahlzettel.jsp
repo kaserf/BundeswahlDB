@@ -11,6 +11,10 @@
 	Wahlzettelauswahl auswahl = auswertung.getWahlzettelauswahl(persnr);
 %>
 
+<div id="errorDialog" title="Fehler">
+	<p>Bitte selektieren Sie einen Direktkandiaten und eine Partei.</p>
+</div>
+
 <table style="border-width: 0px" >
 <tr>
 	<td style="padding: 5px" id="erststimme" valign="top">
@@ -47,6 +51,14 @@
 </div>
 
 <script>
+	$("#errorDialog").dialog({
+		modal: true,
+		autoOpen: false,
+		buttons: {
+	   		OK: function() { $(this).dialog("close"); }
+	   	}
+	});
+
 	$('#erststimme').buttonset();
 	$('#zweitstimme').buttonset();
 	$('[for^="erststimmeRadio"]').each(function(index) {
@@ -57,11 +69,16 @@
 	$('#abgabe').click(function(){
 		var kandidatId = $("input[name='erststimmeRadio']:checked").val();
 		var parteiId = $("input[name='zweitstimmeRadio']:checked").val();
-		$('#wahlzettel').slideUp(function() {
-			$('#wahlzettel').load("widgets/stimmenabgabe/submit.jsp?kandidatId=" 
-					+ kandidatId + "&parteiId=" + parteiId, function() {
-				$('#wahlzettel').slideDown();
+		if (kandidatId == undefined && parteiId == undefined) {
+			$("#errorDialog").dialog('open');
+		}
+		else {
+			$('#wahlzettel').slideUp(function() {
+				$('#wahlzettel').load("widgets/stimmenabgabe/submit.jsp?kandidatId=" 
+						+ kandidatId + "&parteiId=" + parteiId + "&persNr=" + <%= persnr %>, function() {
+					$('#wahlzettel').slideDown();
+				});
 			});
-		});
+		}
 	});
 </script>

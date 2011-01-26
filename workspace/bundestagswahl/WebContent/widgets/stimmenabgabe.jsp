@@ -2,6 +2,9 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 
+<div id="check">
+</div>
+
 <div id="wahlzettel">
 <table>
 <tr>
@@ -25,14 +28,17 @@
 </div>
 
 <script>
+	$("#errorDialog").dialog({
+		modal: true,
+		autoOpen: false,
+		buttons: {
+	   		OK: function() { $(this).dialog("close"); }
+	   	}
+	});
+
 	$("#nextBtn").button();
 	$("#nextBtn").click(function(){
-		var id = $("#id").val();
 		var persnr = $("#persnr").val();
-		$('#wahlzettel').slideUp(function() {
-			$('#wahlzettel').load("widgets/stimmenabgabe/wahlzettel.jsp?persnr=" + persnr, function() {
-				$('#wahlzettel').slideDown();
-			});
-		});	
+		$('#check').load("widgets/stimmenabgabe/checkPersNr.jsp?persnr=" + persnr);	
 	});
 </script>
