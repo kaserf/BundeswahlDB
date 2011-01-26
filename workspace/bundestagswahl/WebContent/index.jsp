@@ -16,11 +16,34 @@ $(function() {
 	$('#menu').buttonset();
 	$('[name="selectRadio"]').each(function(index) {
 		var id = $(this).attr('id');
+		var value = $(this).attr('value');
 		$(this).click(function() {
-			loadWidget(id);
+			if (value != 2 && value != 5 && value != 6) {
+				var time = new Date().getTime();
+				loadWidgetTime(id, time);
+			}
+			else {
+				loadWidget(id);
+				$('#benchmarkResults').html('');
+			}
 		});
 	});	
 });
+
+function showBenchmark(millis) {
+	$('#benchmarkResults').html('Bearbeitungszeit: ' + millis + ' ms');
+}
+
+function loadWidgetTime(name, time) {
+	$('#content').fadeOut('normal', function() {
+		$('#content').load('widgets/' + name + '.jsp', function() {
+			$('#content').fadeIn('slow');
+			var timeEnd = new Date().getTime();
+			var diff = timeEnd - time;
+			showBenchmark(diff);
+		});	
+	});
+}
 
 function loadWidget(name) {
 	$('#content').fadeOut('normal', function() {
@@ -77,13 +100,10 @@ html { overflow: -moz-scrollbars-vertical; overflow-x: auto; }
 
 <div id="container">
 	<div id="content">
-	<h2>Ergebnisse der Bundestagswahl</h2>
-	<object width="480" height="385">
-			<param name="movie" value="http://www.youtube.com/v/KmYKKVuEv5s?fs=1&amp;hl=de_DE"></param>
-			<param name="allowFullScreen" value="true"></param>
-			<param name="allowscriptaccess" value="always"></param>
-			<embed src="http://www.youtube.com/v/KmYKKVuEv5s?fs=1&amp;hl=de_DE" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed>
-	</object>
+	<h2 align="center">Ergebnisse der Bundestagswahl</h2>
+	<div id="image" align="center" style="margin:40px">
+		<img src="img/bundesadler_grau.gif" width="35%" height="35%" />
+	</div>
 	</div>
 
 	<div id="menu">
@@ -100,11 +120,10 @@ html { overflow: -moz-scrollbars-vertical; overflow-x: auto; }
 			<label for="ueberhangmandate">Überhangmandate</label><br />
 		<input type="radio" name="selectRadio" id="knappstesieger" value="5"  />
 			<label for="knappstesieger">Top 10 der knappsten Sieger</label><br />
-		<input type="radio" name="selectRadio" id="stimmenabgabe" value="5"  />
+		<input type="radio" name="selectRadio" id="stimmenabgabe" value="6"  />
 			<label for="stimmenabgabe">Online Stimmenabgabe</label><br />
 		</p>
 		<div id="benchmarkResults">
-		results
 		</div>
 	</div>
 

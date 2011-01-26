@@ -13,7 +13,7 @@
 %>
 <p>
 <div id="accordion">
-    <h3><a href="#">Sieger Erststimmen</a></h3>
+    <h3>Sieger Erststimmen</h3>
     <div>
     	<table id="erststimmenTable" class="tablesorter ui-corner-all">
 		<thead>
@@ -48,7 +48,7 @@
 		</tbody>
 		</table>
 	</div>
-    <h3><a href="#">Sieger Zweitstimmen</a></h3>
+    <h3>Sieger Zweitstimmen</h3>
     <div>
     	<table id="zweitstimmenTable" class="tablesorter ui-corner-all">
 		<thead>

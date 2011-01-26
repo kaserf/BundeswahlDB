@@ -57,5 +57,4 @@
 	$("#sitzTable").tablesorter( {
 		sortList: [[1,1]]
 	});
-	$("#benchmarkResults").html("Zeit: 35ms");
 </script>

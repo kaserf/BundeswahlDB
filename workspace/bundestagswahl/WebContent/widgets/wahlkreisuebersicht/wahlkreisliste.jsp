@@ -29,11 +29,15 @@ $('[name="wahlkreisRadio"]').each(function(index) {
 });
 
 function loadProfile(id) {
+	var time = new Date().getTime();
 	$('#selectedDisplay').slideDown(function() {
 		$('#wahlkreisProfile').fadeOut(function() {
 			$('#wahlkreisProfile').load('widgets/wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=' 
 					+ id + "&live=" + live, function() {
 				$('#wahlkreisProfile').fadeIn();
+				var timeEnd = new Date().getTime();
+				var diff = timeEnd - time;
+				showBenchmark(diff);
 			});
 		});
 	});

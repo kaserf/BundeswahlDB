@@ -28,10 +28,14 @@ $('[for^="parteiRadio"]').each(function(index) {
 $('[name="parteiRadio"]').each(function(index) {
 	var id = $(this).attr('value');
 	$(this).click(function() {
+		var time = new Date().getTime();
 		$('#top10').fadeOut(function() {
 			$('#top10').load('widgets/knappstesieger/top10.jsp?partei=' + id, function() {
 				$('#selectedDisplay').slideDown(function() {
 					$('#top10').fadeIn();
+					var timeEnd = new Date().getTime();
+					var diff = timeEnd - time;
+					showBenchmark(diff);
 				});
 			});	
 		});
