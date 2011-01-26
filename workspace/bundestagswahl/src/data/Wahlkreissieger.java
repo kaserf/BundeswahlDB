@@ -1,8 +1,5 @@
 package data;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class Wahlkreissieger {
 	private int wahlkreisNr;
 	private Einzelergebnis<Kandidat, Integer> erstStimmenSieger;

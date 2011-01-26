@@ -1,10 +1,7 @@
  package data;
  
  import java.util.List;
-
-import javax.xml.bind.annotation.XmlRootElement;
  
- @XmlRootElement
  public class Bundesland
  {
    private String name;

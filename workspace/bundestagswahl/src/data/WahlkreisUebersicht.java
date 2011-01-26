@@ -2,9 +2,6 @@ package data;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class WahlkreisUebersicht {
 	private Wahlkreis wahlkreis;
 	private Kandidat direktkandidat;

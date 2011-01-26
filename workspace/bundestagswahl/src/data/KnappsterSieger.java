@@ -1,8 +1,5 @@
 package data;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class KnappsterSieger {
 	private String partei;
 	private Einzelergebnis<Kandidat, Integer> sieger;

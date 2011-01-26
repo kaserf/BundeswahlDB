@@ -2,16 +2,14 @@ package data;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class Wahlzettelauswahl {
-	
+
 	private List<Kandidat> kandidaten;
-	
+
 	private List<Partei> parteien;
-	
-	public Wahlzettelauswahl() {	}
+
+	public Wahlzettelauswahl() {
+	}
 
 	public void setKandidaten(List<Kandidat> kandidaten) {
 		this.kandidaten = kandidaten;
@@ -28,6 +26,5 @@ public class Wahlzettelauswahl {
 	public List<Partei> getParteien() {
 		return parteien;
 	}
-	
-	
+
 }

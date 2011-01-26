@@ -1,8 +1,5 @@
 package data;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class Partei {
 	private int id;
 	private String name;

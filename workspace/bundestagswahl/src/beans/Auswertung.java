@@ -1,18 +1,5 @@
 package beans;
 
-import data.Bundesland;
-import data.Einzelergebnis;
-import data.Kandidat;
-import data.KnappsterSieger;
-import data.Listenkandidatur;
-import data.Partei;
-import data.Sitzverteilung;
-import data.Ueberhangmandate;
-import data.Wahlkreis;
-import data.WahlkreisUebersicht;
-import data.Wahlkreissieger;
-import data.Wahlzettelauswahl;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,38 +13,25 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
-@Path("/")
-@Produces(MediaType.APPLICATION_JSON)
+import data.Bundesland;
+import data.Einzelergebnis;
+import data.Kandidat;
+import data.KnappsterSieger;
+import data.Listenkandidatur;
+import data.Partei;
+import data.Sitzverteilung;
+import data.Ueberhangmandate;
+import data.Wahlkreis;
+import data.WahlkreisUebersicht;
+import data.Wahlkreissieger;
+import data.Wahlzettelauswahl;
+
 public class Auswertung {
 	private Connection connection = null;
 
 	private int connectionCounter = 0;
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public String getDescription() {
-		String str = "";
-		str += "/rest/sitzverteilung : Sitzverteilung\n";
-		str += "/rest/mitglieder : Bundestagsmitglieder\n";
-		str += "/rest/parteien : Parteienliste\n";
-		str += "/rest/parteien/{nr} : Partei Nr \n";
-		str += "/rest/bundeslaender : Bundeslaender Liste\n";
-		str += "/rest/bundeslaender/{nr} : Bundesland Nr\n";
-		str += "/rest/bundeslaender/{nr}/wahlkreise : Wahlkreise in Bundesland\n";
-		str += "/rest/bundeslaender/{nr}/wahlkreise/{nr} : Wahlkreis mit Nr.\n";
-		str += "/rest/bundeslaender/{nr}/wahlkreise/{nr}/einzelstimmen : Wahlkreise nach Einzelstimmen\n";
-		str += "/rest/wahlkreissieger : Wahlkreissieger\n";
-		str += "/rest/ueberhangmandate : Ueberhangmandate\n";
-		str += "/rest/knappstesieger : Knappste Sieger\n";
-		return str;
-	}
-	
 	private void initConnection() {
 		this.connectionCounter += 1;
 		if (this.connection != null)
@@ -88,8 +62,6 @@ public class Auswertung {
 
 	/** Q1: Sitzverteilung */
 	/** TODO: SQL Query may be improved by crazy aggregation stuff :D */
-	@GET
-	@Path("sitzverteilung")
 	public Sitzverteilung getSitzverteilung() throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
@@ -108,17 +80,15 @@ public class Auswertung {
 			}
 		}
 		freeConnection();
-		List<Einzelergebnis<Partei,Integer>> parteiSitze = new ArrayList<Einzelergebnis<Partei,Integer>>();
+		List<Einzelergebnis<Partei, Integer>> parteiSitze = new ArrayList<Einzelergebnis<Partei, Integer>>();
 		for (String partei : sitze.keySet()) {
-			parteiSitze.add(new Einzelergebnis<Partei,Integer>(new Partei(
+			parteiSitze.add(new Einzelergebnis<Partei, Integer>(new Partei(
 					partei), sitze.get(partei)));
 		}
 		return new Sitzverteilung(parteiSitze);
 	}
 
 	/** Q2: Bundestagsmitglieder */
-	@GET
-	@Path("mitglieder")
 	public List<Kandidat> getBundestagsMitglieder() throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
@@ -152,8 +122,6 @@ public class Auswertung {
 	}
 
 	/** Helper method for jsps. */
-	@GET
-	@Path("parteien")
 	public List<Partei> getAllParteien() throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
@@ -175,9 +143,7 @@ public class Auswertung {
 	}
 
 	/** Gets a {@link Partei} object from its id. Convenience method for jsps */
-	@GET
-	@Path("parteien/{nr}")
-	public Partei getPartei(@PathParam("nr") int parteinr) throws SQLException {
+	public Partei getPartei(int parteinr) throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
 		ResultSet result = stmt
@@ -191,8 +157,6 @@ public class Auswertung {
 	}
 
 	/** Helper method for queries and jsps. */
-	@GET
-	@Path("bundeslaender")
 	public List<Bundesland> getAllBundeslaender() throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
@@ -217,10 +181,8 @@ public class Auswertung {
 	}
 
 	/** Gets all {@link Wahlkreis}e for a {@link Bundesland}. */
-	@GET
-	@Path("bundeslaender/{nr}/wahlkreise")
-	public List<Wahlkreis> getWahlkreiseForBundesland(
-			@PathParam("nr") int bundeslandNr) throws SQLException {
+	public List<Wahlkreis> getWahlkreiseForBundesland(int bundeslandNr)
+			throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
 		List<Wahlkreis> wahlkreise = new ArrayList<Wahlkreis>();
@@ -238,10 +200,7 @@ public class Auswertung {
 	/**
 	 * Gets a {@link Bundesland} object from its id. Convenience method for jsps
 	 */
-	@GET
-	@Path("bundeslaender/{nr}")
-	public Bundesland getBundesland(@PathParam("nr") int bundeslandnr)
-			throws SQLException {
+	public Bundesland getBundesland(int bundeslandnr) throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
 		ResultSet result = stmt
@@ -262,9 +221,7 @@ public class Auswertung {
 	 * 
 	 * @throws SQLException
 	 */
-	@GET
-	@Path("bundeslaender/{nr}/wahlkreise/{wknr}")
-	public WahlkreisUebersicht getWahlkreisUebersicht(@PathParam("wknr") int id)
+	public WahlkreisUebersicht getWahlkreisUebersicht(int id)
 			throws SQLException {
 		initConnection();
 		double wahlbeteiligung;
@@ -352,8 +309,6 @@ public class Auswertung {
 	 * TODO: Implement Query in SQL; don't forget initConnection() and
 	 * freeConnection() :)
 	 */
-	@GET
-	@Path("wahlkreissieger")
 	public List<Wahlkreissieger> getWahlkreisSieger() {
 		List<Wahlkreissieger> sieger = new ArrayList<Wahlkreissieger>();
 		for (int i = 0; i < 299; i++) {
@@ -371,8 +326,6 @@ public class Auswertung {
 	 * TODO: Implement Query in SQL; don't forget initConnection() and
 	 * freeConnection() :)
 	 */
-	@GET
-	@Path("ueberhangmandate")
 	public List<Ueberhangmandate> getUeberhangmandate() throws SQLException {
 		List<Ueberhangmandate> mandate = new ArrayList<Ueberhangmandate>();
 		List<Bundesland> bundeslaender = getAllBundeslaender();
@@ -398,17 +351,15 @@ public class Auswertung {
 	 * TODO: Implement Query in SQL; don't forget initConnection() and
 	 * freeConnection() :)
 	 */
-	@GET
-	@Path("knappstesieger")
 	public List<KnappsterSieger> getKnappsteSieger() {
 		List<KnappsterSieger> knappsteSieger = new ArrayList<KnappsterSieger>();
 		for (int i = 0; i < 10; i++) {
 			Einzelergebnis<Kandidat, Integer> sieger = new Einzelergebnis<Kandidat, Integer>(
-					new Kandidat("Schmidt", "Horst", new Partei("SPD"), 5, null, 0),
-					73);
+					new Kandidat("Schmidt", "Horst", new Partei("SPD"), 5,
+							null, 0), 73);
 			Einzelergebnis<Kandidat, Integer> verlierer = new Einzelergebnis<Kandidat, Integer>(
-					new Kandidat("M�ller", "Hans", new Partei("FDP"), 5, null, 0),
-					71);
+					new Kandidat("M�ller", "Hans", new Partei("FDP"), 5,
+							null, 0), 71);
 			KnappsterSieger knSieger = new KnappsterSieger("SPD", sieger,
 					verlierer);
 			knappsteSieger.add(knSieger);
@@ -421,9 +372,7 @@ public class Auswertung {
 	 * TODO: Implement Query in SQL; don't forget initConnection() and
 	 * freeConnection() :)
 	 */
-	@GET
-	@Path("bundeslaender/{nr}/wahlkreise/{wknr}/einzelstimmen")
-	public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(@PathParam("wknr") int id) {
+	public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(int id) {
 		List<Einzelergebnis<Partei, Integer>> stimmenAbsolut = new ArrayList<Einzelergebnis<Partei, Integer>>();
 		stimmenAbsolut.add(new Einzelergebnis<Partei, Integer>(new Partei(
 				"CDU/CSU"), Integer.valueOf(2499)));
@@ -450,7 +399,7 @@ public class Auswertung {
 				68.700000000000003D, stimmenAbsolut, stimmenProzentual,
 				stimmenEntwicklung);
 	}
-	
+
 	/** Return Kandidats and Landeslists for an id of a citizen. */
 	/* TODO: Implement */
 	public Wahlzettelauswahl getWahlzettelauswahl(String persnr) {
@@ -460,7 +409,8 @@ public class Auswertung {
 		kandidaten.add(createKandidat("Meier", "Horst", "FDP", 1));
 		kandidaten.add(createKandidat("Kaufmann", "Anna", "Gruene", 2));
 		kandidaten.add(createKandidat("Lieber", "Rudolf", "Piraten", 3));
-		kandidaten.add(createKandidat("Mustermann", "Frederik", "Die Rosanen", 4));
+		kandidaten.add(createKandidat("Mustermann", "Frederik", "Die Rosanen",
+				4));
 		auswahl.setKandidaten(kandidaten);
 		List<Partei> parteien = new ArrayList<Partei>();
 		parteien.add(new Partei(0, "SPD"));
@@ -474,6 +424,6 @@ public class Auswertung {
 
 	/* TODO: Implement */
 	public void setWahlzettel(int kandidatId, int parteiId, String hash) {
-		
+
 	}
 }

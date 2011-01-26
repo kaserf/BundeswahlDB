@@ -27,6 +27,7 @@ $('[name="wahlkreisRadio"]').each(function(index) {
 });
 
 function loadProfile(id) {
+	System.alert("clicked "+id);
 	$('#selectedDisplay').slideDown(function() {
 		$('#wahlkreisProfile').fadeOut(function() {
 			$('#wahlkreisProfile').load('widgets/wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=' 
