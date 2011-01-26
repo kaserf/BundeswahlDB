@@ -342,22 +342,29 @@ public class Auswertung {
 	 * freeConnection() :)
 	 */
 	public List<Ueberhangmandate> getUeberhangmandate() throws SQLException {
+		initConnection();
+		Statement stmt = this.connection.createStatement();
 		List<Ueberhangmandate> mandate = new ArrayList<Ueberhangmandate>();
-		List<Bundesland> bundeslaender = getAllBundeslaender();
-		for (Bundesland bundesland : bundeslaender) {
+		ResultSet result = stmt.executeQuery("with ergebnis_pro_wk as (select L.Partei, E.Wahlkreis, L.Stimmenanzahl from Listenergebnis L join Wahlergebnis E on L.wahlergebnis = E.id where E.wahljahr = 2009)," +
+				"direktergebnis_pro_wk as (select D.Kandidat, E.Wahlkreis, D.Stimmenanzahl from Direktergebnis D join Wahlergebnis E on D.wahlergebnis = E.id where E.wahljahr = 2009)," +
+				"struktur_deutschland as (select sum(gueltig_zweit) as gueltige_stimmen from Struktur where jahr = 2009)," +
+				"parteien_deutschland as (select Partei, sum(stimmenanzahl) as partei_stimmen, cast(sum(stimmenanzahl) as float)/(select gueltige_stimmen from struktur_deutschland) as prozente	from ergebnis_pro_wk	group by Partei)," +
+				"parteien_bundesland as (select w.bundesland, e.Partei, sum(stimmenanzahl) as partei_stimmen from ergebnis_pro_wk e join wahlkreis w on e.wahlkreis = w.nummer group by e.Partei, w.bundesland)," +
+				"partei_dividiert as (select S.Partei, S.partei_stimmen / D.divisor from parteien_deutschland S, Divisor D where S.prozente >= 0.05 order by S.partei_stimmen / D.divisor desc limit (598))," +
+				"parteien_sitze as (select D.Partei, count(*) as Sitze from partei_dividiert D group by D.Partei	order by Sitze desc)," +
+				"parteien_bundesland_ranking as (select dense_rank() over (partition by P.Partei order by P.partei_stimmen / D.divisor desc) as Rang, P.Partei, P.Bundesland, P.partei_stimmen / D.divisor from parteien_bundesland P, Divisor D order by P.Partei,Rang)," +
+				"parteien_bundesland_sitze as (select D.Partei, D.Bundesland, count(*) as Sitze from parteien_bundesland_ranking D, parteien_sitze S where D.Partei = S.Partei and D.Rang <= S.Sitze group by D.Partei,D.Bundesland order by D.Partei)," +
+				"direktkandidaten_gewaehlt as (select A.Kandidat, A.Wahlkreis from direktergebnis_pro_wk A where A.stimmenanzahl=(select max(B.stimmenanzahl) from direktergebnis_pro_wk B where A.Wahlkreis=B.Wahlkreis))," +
+				"direktmandate_parteien_bundesland as (select K.Partei, W.Bundesland, count(*) as Direktmandate from direktkandidaten_gewaehlt G, Kandidat K, Wahlkreis W where G.Wahlkreis=W.Nummer and G.Kandidat=K.ausweisnummer and K.Partei <> 99 group by K.Partei,W.Bundesland)," +
+				"ueberhang as (select D.Partei, D.Bundesland, (case when M.Direktmandate - D.Sitze > 0 then M.Direktmandate - D.Sitze else 0 end) as Ueberhangmandate from parteien_bundesland_sitze D left outer join direktmandate_parteien_bundesland M on D.Partei=M.Partei and D.Bundesland=M.Bundesland)" +
+				"select b.name, up.kurzbezeichnung, up.ueberhangmandate from (ueberhang u join partei p on u.partei = p.nummer) up join bundesland b on up.bundesland = b.nummer where up.ueberhangmandate > 0;");
+		while (result.next()) {
 			List<Einzelergebnis<Partei, Integer>> ergebnisse = new ArrayList<Einzelergebnis<Partei, Integer>>();
 			ergebnisse.add(new Einzelergebnis<Partei, Integer>(
-					new Partei("SPD"), 29));
-			ergebnisse.add(new Einzelergebnis<Partei, Integer>(
-					new Partei("FDP"), 5));
-			ergebnisse.add(new Einzelergebnis<Partei, Integer>(
-					new Partei("CDU"), 7));
-			ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei(
-					"Gr�ne"), 3));
-			Ueberhangmandate mandat = new Ueberhangmandate(bundesland,
-					ergebnisse);
-			mandate.add(mandat);
+					new Partei(result.getString(2)), result.getInt(3)));
+			mandate.add(new Ueberhangmandate(new Bundesland(result.getString(1), null), ergebnisse));
 		}
+		freeConnection();
 		return mandate;
 	}
 
