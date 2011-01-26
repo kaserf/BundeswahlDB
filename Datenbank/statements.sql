@@ -84,7 +84,7 @@ ueberhang as
 	(case when M.Direktmandate - D.Sitze > 0 then M.Direktmandate - D.Sitze else 0 end) as Ueberhangmandate
 	from parteien_bundesland_sitze D left outer join direktmandate_parteien_bundesland M on D.Partei=M.Partei and D.Bundesland=M.Bundesland
 )
-select b.name, up.kurzbezeichnung, up.ueberhangmandate
+select b.name, b.kuerzel, up.kurzbezeichnung, up.ueberhangmandate
 from (ueberhang u join partei p on u.partei = p.nummer) up join bundesland b on up.bundesland = b.nummer where up.ueberhangmandate > 0;
 
 --wahlkreissieger (parteien) erst und zweitstimmen (aggregiert)
@@ -111,6 +111,25 @@ select p.kurzbezeichnung, lw.stimmenanzahl as stimmen, old_prozente.vor_stimmen 
 WITH wdk as (SELECT * FROM ((wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer) wdk WHERE wdk.wahljahr = 2009 AND wdk.wahlkreis = 55)
 SELECT wdk.vorname, wdk.nachname, wdk.kurzbezeichnung FROM wdk WHERE wdk.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk);
 
+
+
+--wahlausgang für einen wahlkreis (nicht aggregiert, bis auf werte von 2005)
+with
+stimmen_pro_partei as
+(select zweitstimme as partei, COUNT(*) as stimmenanzahl FROM Wahlzettel WHERE Wahlkreis = 55 GROUP BY zweitstimme),
+gesamt09 as 
+(select SUM(stimmenanzahl) as gesamt from stimmen_pro_partei),
+gesamt05 as 
+(select gueltig_zweit as gesamt from struktur where wahlkreis = 55 and jahr = 2005), 
+old_prozente as 
+(select l2.partei, cast(l2.stimmenanzahl as float)/gesamt05.gesamt as vor_stimmen from gesamt05, listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2005 and w2.wahlkreis = 55), 
+new_prozente as 
+(select spp.partei, cast(spp.stimmenanzahl as float)/gesamt09.gesamt as vor_stimmen from gesamt09, stimmen_pro_partei spp)
+select p.kurzbezeichnung, spp.stimmenanzahl as stimmen, old_prozente.vor_stimmen * 100 as prozente_old, new_prozente.vor_stimmen * 100 as prozente_new, (new_prozente.vor_stimmen - old_prozente.vor_stimmen) * 100 as prozente_diff from stimmen_pro_partei spp join partei p on spp.partei = p.nummer, old_prozente, new_prozente where old_prozente.partei = spp.partei and new_prozente.partei = spp.partei;
+
+
+--*******************************************************************************
+
 --wahlbeteiligung für einen wahlkreis (direktberechnung, ohne aggregate)
 --wk 55 liegt in bremen
 SELECT 55 as Wahlkreis, (CAST (anz_gew as float)/anz_ber) * 100 as Beteiligung
@@ -120,18 +139,18 @@ SELECT 55 as Wahlkreis, (CAST (anz_gew as float)/anz_ber) * 100 as Beteiligung
         AS berechtigte_kreis;
 
 --gewählter direktkandidat für wahlkreis
-WITH stimmen_pro_kandidat (kandidat, anz) AS (SELECT erststimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = 55 GROUP BY erststimme)
-
-SELECT ausweisnummer, vorname, nachname
-FROM Kandidat
+WITH stimmen_pro_kandidat (kandidat, anz) AS (SELECT erststimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = 55 GROUP BY erststimme),
+stimmen_pro_partei (partei_nr, anz_p) AS (SELECT zweitstimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = 55 GROUP BY zweitstimme)
+SELECT vorname, nachname, kurzbezeichnung
+FROM Kandidat k join Partei p on p.nummer = k.partei
 WHERE ausweisnummer = (SELECT kandidat FROM stimmen_pro_kandidat WHERE anz = (SELECT MAX(anz) FROM stimmen_pro_kandidat));
 
 --stimmenanzahl nach partei
-WITH stimmen_pro_partei (partei_nr, anz_p)
-AS (SELECT zweitstimme, COUNT(*)
-    FROM Wahlzettel
-    WHERE Wahlkreis = 55
-    GROUP BY zweitstimme)
+--WITH stimmen_pro_partei (partei_nr, anz_p)
+--AS (SELECT zweitstimme, COUNT(*)
+--    FROM Wahlzettel
+--    WHERE Wahlkreis = 55
+--    GROUP BY zweitstimme)
 SELECT p.kurzbezeichnung, (CAST (s.anz_p as float) / foo.anz_ges) * 100 as prozente, anz_p as stimmen
 FROM Partei p, stimmen_pro_partei s, (SELECT COUNT(*) AS anz_ges FROM Wahlzettel WHERE Wahlkreis = 55 AND zweitstimme IS NOT NULL) as foo
 WHERE p.nummer = s.partei_nr

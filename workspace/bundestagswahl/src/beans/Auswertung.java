@@ -395,33 +395,69 @@ public class Auswertung {
 	/**
 	 * TODO: Implement Query in SQL; don't forget initConnection() and
 	 * freeConnection() :)
+	 * @throws SQLException 
 	 */
-	public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(int id) {
+	public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(int id) throws SQLException {
+		initConnection();
+		Statement stmt = this.connection.createStatement();
+		String wk_name;
 		List<Einzelergebnis<Partei, Integer>> stimmenAbsolut = new ArrayList<Einzelergebnis<Partei, Integer>>();
-		stimmenAbsolut.add(new Einzelergebnis<Partei, Integer>(new Partei(
-				"CDU/CSU"), Integer.valueOf(2499)));
-		stimmenAbsolut.add(new Einzelergebnis<Partei, Integer>(
-				new Partei("FDP"), Integer.valueOf(367)));
-		stimmenAbsolut.add(new Einzelergebnis<Partei, Integer>(
-				new Partei("SPD"), Integer.valueOf(1499)));
-		List<Einzelergebnis<Partei, Double>> stimmenProzentual = new ArrayList<Einzelergebnis<Partei, Double>>();
-		stimmenProzentual.add(new Einzelergebnis<Partei, Double>(new Partei(
-				"CDU/CSU"), Double.valueOf(49.399999999999999D)));
-		stimmenProzentual.add(new Einzelergebnis<Partei, Double>(new Partei(
-				"FDP"), Double.valueOf(5.4D)));
-		stimmenProzentual.add(new Einzelergebnis<Partei, Double>(new Partei(
-				"SPD"), Double.valueOf(35.200000000000003D)));
 		List<Einzelergebnis<Partei, Double>> stimmenEntwicklung = new ArrayList<Einzelergebnis<Partei, Double>>();
-		stimmenEntwicklung.add(new Einzelergebnis<Partei, Double>(new Partei(
-				"CDU/CSU"), Double.valueOf(4.2D)));
-		stimmenEntwicklung.add(new Einzelergebnis<Partei, Double>(new Partei(
-				"FDP"), Double.valueOf(1.3D)));
-		stimmenEntwicklung.add(new Einzelergebnis<Partei, Double>(new Partei(
-				"SPD"), Double.valueOf(-4.7D)));
-		return new WahlkreisUebersicht(new Wahlkreis(id, "Testwahlkreis"),
-				createKandidat("K�hler", "Horst", "CSU", 0),
-				68.700000000000003D, stimmenAbsolut, stimmenProzentual,
+		List<Einzelergebnis<Partei, Double>> stimmenProzentual = new ArrayList<Einzelergebnis<Partei, Double>>();
+		ResultSet result = stmt
+				.executeQuery("SELECT (CAST (anz_gew as float)/anz_ber) * 100 as Beteiligung " +
+						"FROM (SELECT COUNT(*) as anz_gew FROM Wahlberechtigte WHERE gewaehlt = true AND wahlkreis = " + id +
+						") AS gewaehlt_kreis, (SELECT COUNT(*) as anz_ber FROM Wahlberechtigte WHERE wahlkreis = 55) AS berechtigte_kreis;");
+		result.next();
+		double wahlbeteiligung = result.getDouble(1);
+		
+		result = stmt.executeQuery("SELECT name FROM wahlkreis WHERE nummer = "
+				+ id);
+		result.next();
+		wk_name = result.getString(1);
+
+		result = stmt
+				.executeQuery("with stimmen_pro_partei as (select zweitstimme as partei, COUNT(*) as stimmenanzahl FROM Wahlzettel WHERE Wahlkreis = " + id +
+						" GROUP BY zweitstimme), " +
+						"gesamt09 as (select SUM(stimmenanzahl) as gesamt from stimmen_pro_partei), " +
+						"gesamt05 as (select gueltig_zweit as gesamt from struktur where wahlkreis = " + id +
+						" and jahr = 2005), " +
+						"old_prozente as (select l2.partei, cast(l2.stimmenanzahl as float)/gesamt05.gesamt as vor_stimmen from gesamt05, " +
+						"listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2005 and w2.wahlkreis = " + id +
+						"), new_prozente as (select spp.partei, cast(spp.stimmenanzahl as float)/gesamt09.gesamt as vor_stimmen from gesamt09, " +
+						"stimmen_pro_partei spp) select p.kurzbezeichnung, spp.stimmenanzahl as stimmen, old_prozente.vor_stimmen * 100 as prozente_old, " +
+						"new_prozente.vor_stimmen * 100 as prozente_new, (new_prozente.vor_stimmen - old_prozente.vor_stimmen) * 100 as prozente_diff " +
+						"from stimmen_pro_partei spp join partei p on spp.partei = p.nummer, old_prozente, new_prozente where old_prozente.partei = spp.partei " +
+						"and new_prozente.partei = spp.partei;");
+		while (result.next()) {
+			stimmenAbsolut.add(new Einzelergebnis<Partei, Integer>(new Partei(
+					result.getString(1)), Integer.valueOf(result.getInt(2))));
+			stimmenProzentual.add(new Einzelergebnis<Partei, Double>(
+					new Partei(result.getString(1)), Double.valueOf(result
+							.getDouble(4))));
+			stimmenEntwicklung.add(new Einzelergebnis<Partei, Double>(
+					new Partei(result.getString(1)), Double.valueOf(result
+							.getDouble(5))));
+		}
+
+		result = stmt
+				.executeQuery("WITH stimmen_pro_kandidat (kandidat, anz) AS (SELECT erststimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = " + id +
+						" GROUP BY erststimme), stimmen_pro_partei (partei_nr, anz_p) AS (SELECT zweitstimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = " + id +
+						" GROUP BY zweitstimme) SELECT vorname, nachname, kurzbezeichnung FROM Kandidat k join Partei p on p.nummer = k.partei " +
+						"WHERE ausweisnummer = (SELECT kandidat FROM stimmen_pro_kandidat WHERE anz = (SELECT MAX(anz) FROM stimmen_pro_kandidat));");
+		result.next();
+
+		String vorname = result.getString(1);
+		String nachname = result.getString(2);
+		String partei = result.getString(3);
+
+		WahlkreisUebersicht ret = new WahlkreisUebersicht(new Wahlkreis(id,
+				wk_name), createKandidat(nachname, vorname, partei, 0),
+				wahlbeteiligung, stimmenAbsolut, stimmenProzentual,
 				stimmenEntwicklung);
+
+		freeConnection();
+		return ret;
 	}
 
 	/** Check whether Personalnummer is valid. */
