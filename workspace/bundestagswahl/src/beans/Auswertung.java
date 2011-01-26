@@ -308,18 +308,25 @@ public class Auswertung {
 		List<Wahlkreissieger> sieger = new ArrayList<Wahlkreissieger>();
 		Statement stmt = this.connection.createStatement();
 		ResultSet result = stmt
-				.executeQuery("WITH wdk as (SELECT * FROM ((wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) "
-						+ "wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer) wdk "
-						+ "WHERE wdk.wahljahr = 2009), "
-						+ "pwl as (SELECT * FROM ((wahlergebnis w JOIN listenergebnis l ON w.id = l.wahlergebnis) "
-						+ "wl JOIN partei p ON p.nummer = wl.partei) pwl WHERE pwl.wahljahr = 2009), "
-						+ "erst_sieger as (SELECT relation_outer.kurzbezeichnung, relation_outer.wahlkreis, relation_outer.stimmenanzahl, relation_outer.vorname, relation_outer.nachname "
-						+ "FROM wdk relation_outer WHERE relation_outer.stimmenanzahl = (SELECT MAX(stimmenanzahl) "
-						+ "FROM wdk relation_inner WHERE relation_outer.wahlkreis=relation_inner.wahlkreis)) "
-						+ "SELECT es.kurzbezeichnung as erstpartei, es.vorname, es.nachname, es.stimmenanzahl as erststimmen, zweit_outer.kurzbezeichnung as zweitsieger, zweit_outer.stimmenanzahl as zweitstimmen, zweit_outer.wahlkreis "
-						+ "FROM pwl zweit_outer JOIN erst_sieger es ON zweit_outer.wahlkreis = es.wahlkreis "
-						+ "WHERE zweit_outer.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM pwl zweit_inner "
-						+ "WHERE zweit_outer.wahlkreis=zweit_inner.wahlkreis);");
+				.executeQuery("WITH "
+						+ "wdk as (SELECT * FROM ((wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd "
+						+ "JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer) wdk "
+						+ "WHERE wdk.wahljahr = 2009),	pwl as (SELECT * FROM ((wahlergebnis w JOIN listenergebnis l ON w.id = l.wahlergebnis) wl "
+						+ "JOIN partei p ON p.nummer = wl.partei) pwl "
+						+ "WHERE pwl.wahljahr = 2009),	pwl_filtered as (SELECT * FROM pwl pwl_inner "
+						+ "WHERE pwl_inner.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM pwl pwl_inner2 WHERE pwl_inner2.wahlkreis = pwl_inner.wahlkreis)), "
+						+ "erst_sieger as (SELECT relation_outer.kurzbezeichnung, relation_outer.wahlkreis, relation_outer.stimmenanzahl, "
+						+ "relation_outer.vorname, relation_outer.nachname "
+						+ "FROM wdk relation_outer WHERE relation_outer.stimmenanzahl = "
+						+ "(SELECT MAX(stimmenanzahl) FROM wdk relation_inner "
+						+ "WHERE relation_outer.wahlkreis=relation_inner.wahlkreis)) "
+						+ "SELECT "
+						+ "es.kurzbezeichnung as erstpartei, "
+						+ "es.vorname,	es.nachname, "
+						+ "es.stimmenanzahl as erststimmen, "
+						+ "zweit.kurzbezeichnung as zweitsieger, "
+						+ "zweit.stimmenanzahl as zweitstimmen, "
+						+ "zweit.wahlkreis FROM pwl_filtered zweit JOIN erst_sieger es ON zweit.wahlkreis = es.wahlkreis;");
 		while (result.next()) {
 			Wahlkreissieger wahlkreissieger = new Wahlkreissieger(
 					result.getInt(7), new Einzelergebnis<Kandidat, Integer>(
@@ -345,23 +352,24 @@ public class Auswertung {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
 		List<Ueberhangmandate> mandate = new ArrayList<Ueberhangmandate>();
-		ResultSet result = stmt.executeQuery("with ergebnis_pro_wk as (select L.Partei, E.Wahlkreis, L.Stimmenanzahl from Listenergebnis L join Wahlergebnis E on L.wahlergebnis = E.id where E.wahljahr = 2009)," +
-				"direktergebnis_pro_wk as (select D.Kandidat, E.Wahlkreis, D.Stimmenanzahl from Direktergebnis D join Wahlergebnis E on D.wahlergebnis = E.id where E.wahljahr = 2009)," +
-				"struktur_deutschland as (select sum(gueltig_zweit) as gueltige_stimmen from Struktur where jahr = 2009)," +
-				"parteien_deutschland as (select Partei, sum(stimmenanzahl) as partei_stimmen, cast(sum(stimmenanzahl) as float)/(select gueltige_stimmen from struktur_deutschland) as prozente	from ergebnis_pro_wk	group by Partei)," +
-				"parteien_bundesland as (select w.bundesland, e.Partei, sum(stimmenanzahl) as partei_stimmen from ergebnis_pro_wk e join wahlkreis w on e.wahlkreis = w.nummer group by e.Partei, w.bundesland)," +
-				"partei_dividiert as (select S.Partei, S.partei_stimmen / D.divisor from parteien_deutschland S, Divisor D where S.prozente >= 0.05 order by S.partei_stimmen / D.divisor desc limit (598))," +
-				"parteien_sitze as (select D.Partei, count(*) as Sitze from partei_dividiert D group by D.Partei	order by Sitze desc)," +
-				"parteien_bundesland_ranking as (select dense_rank() over (partition by P.Partei order by P.partei_stimmen / D.divisor desc) as Rang, P.Partei, P.Bundesland, P.partei_stimmen / D.divisor from parteien_bundesland P, Divisor D order by P.Partei,Rang)," +
-				"parteien_bundesland_sitze as (select D.Partei, D.Bundesland, count(*) as Sitze from parteien_bundesland_ranking D, parteien_sitze S where D.Partei = S.Partei and D.Rang <= S.Sitze group by D.Partei,D.Bundesland order by D.Partei)," +
-				"direktkandidaten_gewaehlt as (select A.Kandidat, A.Wahlkreis from direktergebnis_pro_wk A where A.stimmenanzahl=(select max(B.stimmenanzahl) from direktergebnis_pro_wk B where A.Wahlkreis=B.Wahlkreis))," +
-				"direktmandate_parteien_bundesland as (select K.Partei, W.Bundesland, count(*) as Direktmandate from direktkandidaten_gewaehlt G, Kandidat K, Wahlkreis W where G.Wahlkreis=W.Nummer and G.Kandidat=K.ausweisnummer and K.Partei <> 99 group by K.Partei,W.Bundesland)," +
-				"ueberhang as (select D.Partei, D.Bundesland, (case when M.Direktmandate - D.Sitze > 0 then M.Direktmandate - D.Sitze else 0 end) as Ueberhangmandate from parteien_bundesland_sitze D left outer join direktmandate_parteien_bundesland M on D.Partei=M.Partei and D.Bundesland=M.Bundesland)" +
-				"select b.name, b.kuerzel, up.kurzbezeichnung, up.ueberhangmandate from (ueberhang u join partei p on u.partei = p.nummer) up join bundesland b on up.bundesland = b.nummer where up.ueberhangmandate > 0;");
+		ResultSet result = stmt
+				.executeQuery("with ergebnis_pro_wk as (select L.Partei, E.Wahlkreis, L.Stimmenanzahl from Listenergebnis L join Wahlergebnis E on L.wahlergebnis = E.id where E.wahljahr = 2009),"
+						+ "direktergebnis_pro_wk as (select D.Kandidat, E.Wahlkreis, D.Stimmenanzahl from Direktergebnis D join Wahlergebnis E on D.wahlergebnis = E.id where E.wahljahr = 2009),"
+						+ "struktur_deutschland as (select sum(gueltig_zweit) as gueltige_stimmen from Struktur where jahr = 2009),"
+						+ "parteien_deutschland as (select Partei, sum(stimmenanzahl) as partei_stimmen, cast(sum(stimmenanzahl) as float)/(select gueltige_stimmen from struktur_deutschland) as prozente	from ergebnis_pro_wk	group by Partei),"
+						+ "parteien_bundesland as (select w.bundesland, e.Partei, sum(stimmenanzahl) as partei_stimmen from ergebnis_pro_wk e join wahlkreis w on e.wahlkreis = w.nummer group by e.Partei, w.bundesland),"
+						+ "partei_dividiert as (select S.Partei, S.partei_stimmen / D.divisor from parteien_deutschland S, Divisor D where S.prozente >= 0.05 order by S.partei_stimmen / D.divisor desc limit (598)),"
+						+ "parteien_sitze as (select D.Partei, count(*) as Sitze from partei_dividiert D group by D.Partei	order by Sitze desc),"
+						+ "parteien_bundesland_ranking as (select dense_rank() over (partition by P.Partei order by P.partei_stimmen / D.divisor desc) as Rang, P.Partei, P.Bundesland, P.partei_stimmen / D.divisor from parteien_bundesland P, Divisor D order by P.Partei,Rang),"
+						+ "parteien_bundesland_sitze as (select D.Partei, D.Bundesland, count(*) as Sitze from parteien_bundesland_ranking D, parteien_sitze S where D.Partei = S.Partei and D.Rang <= S.Sitze group by D.Partei,D.Bundesland order by D.Partei),"
+						+ "direktkandidaten_gewaehlt as (select A.Kandidat, A.Wahlkreis from direktergebnis_pro_wk A where A.stimmenanzahl=(select max(B.stimmenanzahl) from direktergebnis_pro_wk B where A.Wahlkreis=B.Wahlkreis)),"
+						+ "direktmandate_parteien_bundesland as (select K.Partei, W.Bundesland, count(*) as Direktmandate from direktkandidaten_gewaehlt G, Kandidat K, Wahlkreis W where G.Wahlkreis=W.Nummer and G.Kandidat=K.ausweisnummer and K.Partei <> 99 group by K.Partei,W.Bundesland),"
+						+ "ueberhang as (select D.Partei, D.Bundesland, (case when M.Direktmandate - D.Sitze > 0 then M.Direktmandate - D.Sitze else 0 end) as Ueberhangmandate from parteien_bundesland_sitze D left outer join direktmandate_parteien_bundesland M on D.Partei=M.Partei and D.Bundesland=M.Bundesland)"
+						+ "select b.name, b.kuerzel, up.kurzbezeichnung, up.ueberhangmandate from (ueberhang u join partei p on u.partei = p.nummer) up join bundesland b on up.bundesland = b.nummer where up.ueberhangmandate > 0;");
 		while (result.next()) {
 			List<Einzelergebnis<Partei, Integer>> ergebnisse = new ArrayList<Einzelergebnis<Partei, Integer>>();
-			ergebnisse.add(new Einzelergebnis<Partei, Integer>(
-					new Partei(result.getString(3)), result.getInt(4)));
+			ergebnisse.add(new Einzelergebnis<Partei, Integer>(new Partei(
+					result.getString(3)), result.getInt(4)));
 			Bundesland bl = new Bundesland(result.getString(1), null);
 			bl.setKuerzel(result.getString(2));
 			mandate.add(new Ueberhangmandate(bl, ergebnisse));
