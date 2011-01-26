@@ -39,7 +39,10 @@
 		}
 		for (Bundesland bl : bundeslaender) {
 			int index = bundeslaender.indexOf(bl);
-			int anzahl = anzahlMandate.get(bl.getKuerzel());
+			Integer anzahl = anzahlMandate.get(bl.getKuerzel());
+			if (anzahl == null) {
+				anzahl = 0;
+			}
 %>
 		    data.setValue(<%= index %>, 0, '<%= "DE-" + bl.getKuerzel() %>');
 		    data.setValue(<%= index %>, 1, <%= anzahl %>);

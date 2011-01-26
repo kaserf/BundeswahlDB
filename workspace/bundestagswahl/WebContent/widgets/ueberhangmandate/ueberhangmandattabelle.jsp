@@ -18,6 +18,7 @@
 			break;
 		}
 	}
+	if (blMandat != null) {
 %>
 
 	<h3>Überhangmandate in <%= bundeslandName %></h3>
@@ -41,7 +42,10 @@
 		%>
 		</tbody> 
 	</table>
-	
+<%
+	}
+%>
+
 <script>
 	$("#mandateTable").tablesorter();
 </script>
