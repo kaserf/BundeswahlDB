@@ -357,12 +357,14 @@ public class Auswertung {
 				"direktkandidaten_gewaehlt as (select A.Kandidat, A.Wahlkreis from direktergebnis_pro_wk A where A.stimmenanzahl=(select max(B.stimmenanzahl) from direktergebnis_pro_wk B where A.Wahlkreis=B.Wahlkreis))," +
 				"direktmandate_parteien_bundesland as (select K.Partei, W.Bundesland, count(*) as Direktmandate from direktkandidaten_gewaehlt G, Kandidat K, Wahlkreis W where G.Wahlkreis=W.Nummer and G.Kandidat=K.ausweisnummer and K.Partei <> 99 group by K.Partei,W.Bundesland)," +
 				"ueberhang as (select D.Partei, D.Bundesland, (case when M.Direktmandate - D.Sitze > 0 then M.Direktmandate - D.Sitze else 0 end) as Ueberhangmandate from parteien_bundesland_sitze D left outer join direktmandate_parteien_bundesland M on D.Partei=M.Partei and D.Bundesland=M.Bundesland)" +
-				"select b.name, up.kurzbezeichnung, up.ueberhangmandate from (ueberhang u join partei p on u.partei = p.nummer) up join bundesland b on up.bundesland = b.nummer where up.ueberhangmandate > 0;");
+				"select b.name, b.kuerzel, up.kurzbezeichnung, up.ueberhangmandate from (ueberhang u join partei p on u.partei = p.nummer) up join bundesland b on up.bundesland = b.nummer where up.ueberhangmandate > 0;");
 		while (result.next()) {
 			List<Einzelergebnis<Partei, Integer>> ergebnisse = new ArrayList<Einzelergebnis<Partei, Integer>>();
 			ergebnisse.add(new Einzelergebnis<Partei, Integer>(
-					new Partei(result.getString(2)), result.getInt(3)));
-			mandate.add(new Ueberhangmandate(new Bundesland(result.getString(1), null), ergebnisse));
+					new Partei(result.getString(3)), result.getInt(4)));
+			Bundesland bl = new Bundesland(result.getString(1), null);
+			bl.setKuerzel(result.getString(2));
+			mandate.add(new Ueberhangmandate(bl, ergebnisse));
 		}
 		freeConnection();
 		return mandate;
