@@ -1,3 +1,11 @@
+--wahlkreissieger (parteien) erst und zweitstimmen (aggregiert)
+WITH
+wdk as (SELECT * FROM ((wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer) wdk WHERE wdk.wahljahr = 2009),
+pwl as (SELECT * FROM ((wahlergebnis w JOIN listenergebnis l ON w.id = l.wahlergebnis) wl JOIN partei p ON p.nummer = wl.partei) pwl WHERE pwl.wahljahr = 2009),
+erst_sieger as (SELECT relation_outer.kurzbezeichnung, relation_outer.wahlkreis, relation_outer.stimmenanzahl, relation_outer.vorname, relation_outer.nachname FROM wdk relation_outer WHERE relation_outer.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk relation_inner WHERE relation_outer.wahlkreis=relation_inner.wahlkreis))
+SELECT es.kurzbezeichnung as erstpartei, es.vorname, es.nachname, es.stimmenanzahl as erststimmen, zweit_outer.kurzbezeichnung as zweitsieger, zweit_outer.stimmenanzahl as zweitstimmen, zweit_outer.wahlkreis FROM pwl zweit_outer JOIN erst_sieger es ON zweit_outer.wahlkreis = es.wahlkreis WHERE zweit_outer.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM pwl zweit_inner WHERE zweit_outer.wahlkreis=zweit_inner.wahlkreis);
+
+
 --wahlausgang für einen wahlkreis (aggregierte berechnung)
 with
 gesamt09 as 
