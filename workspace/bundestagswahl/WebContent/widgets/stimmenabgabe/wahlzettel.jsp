@@ -6,9 +6,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%
-	String id = request.getParameter("id");
 	String persnr = request.getParameter("persnr");
-	//TODO: Check validity
 	Auswertung auswertung = new Auswertung();
 	Wahlzettelauswahl auswahl = auswertung.getWahlzettelauswahl(persnr);
 %>
@@ -43,6 +41,7 @@
 	</td>
 </tr>
 </table>
+<br>
 <div align="right">
 	<button id="abgabe">Stimme abgeben</button>
 </div>
@@ -58,12 +57,9 @@
 	$('#abgabe').click(function(){
 		var kandidatId = $("input[name='erststimmeRadio']:checked").val();
 		var parteiId = $("input[name='zweitstimmeRadio']:checked").val();
-		//TODO: Calculate hash
-		var hash = "hash";
-		window.alert(kandidatId + " " + parteiId);
 		$('#wahlzettel').slideUp(function() {
 			$('#wahlzettel').load("widgets/stimmenabgabe/submit.jsp?kandidatId=" 
-					+ kandidatId + "&parteiId=" + parteiId + "&hash=" + hash, function() {
+					+ kandidatId + "&parteiId=" + parteiId, function() {
 				$('#wahlzettel').slideDown();
 			});
 		});

@@ -7,18 +7,6 @@
 <tr>
 	<td style="padding: 5px">
 		<div class="ui-widget">
-		<label>Bitte geben Sie Ihre ID an:</label>
-		</div>
-	</td>
-	<td style="padding: 5px">
-		<div class="ui-widget">
-		<input id="id" type="text" />
-		</div>
-	</td>
-</tr>
-<tr>
-	<td style="padding: 5px">
-		<div class="ui-widget">
 		<label>Bitte geben Sie Ihre Personalausweisnummer an:</label>
 		</div>
 	</td>
@@ -29,7 +17,7 @@
 	</td>
 </tr>
 </table>
-
+<br>
 <div align="right">
 <button id="nextBtn">Weiter</button>
 </div>
@@ -42,7 +30,7 @@
 		var id = $("#id").val();
 		var persnr = $("#persnr").val();
 		$('#wahlzettel').slideUp(function() {
-			$('#wahlzettel').load("widgets/stimmenabgabe/wahlzettel.jsp?id=" + id + "&persnr=" + persnr, function() {
+			$('#wahlzettel').load("widgets/stimmenabgabe/wahlzettel.jsp?persnr=" + persnr, function() {
 				$('#wahlzettel').slideDown();
 			});
 		});	

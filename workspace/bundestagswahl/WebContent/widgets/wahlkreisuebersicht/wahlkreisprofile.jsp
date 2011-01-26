@@ -1,3 +1,4 @@
+<%@page import="java.text.NumberFormat"%>
 <%@page import="com.googlecode.charts4j.DataUtil"%>
 <%@page import="com.googlecode.charts4j.AxisTextAlignment"%>
 <%@page import="com.googlecode.charts4j.AxisStyle"%>
@@ -33,10 +34,13 @@
 		uebersicht = auswertung.getWahlkreisUebersicht(id);
 	}
 	Kandidat kandidat = uebersicht.getDirektkandidat();
+	NumberFormat numberFormat = NumberFormat.getInstance();
+	numberFormat.setMaximumFractionDigits(2);
+	String wahlbeteiligung = numberFormat.format(uebersicht.getWahlbeteiligung());
 %>
 <h2>Ergebnisse für Wahlkreis: <%= request.getParameter("wahlkreis") + " - " + uebersicht.getWahlkreis().getName() %></h2>
 <h3>Direktkandidat: <%= kandidat.getVorname() + " " + kandidat.getName() + " (" + kandidat.getPartei() + ")" %></h3>
-<h3>Wahlbeteiligung: <%= uebersicht.getWahlbeteiligung() + "%"%></h3>
+<h3>Wahlbeteiligung: <%= wahlbeteiligung + "%"%></h3>
 
 <%
 	List<Einzelergebnis<Partei, Double>> stimmenProzentual = uebersicht.getStimmenProzentual();
@@ -47,7 +51,8 @@
 		String parteiName = erg.getEntity().getName();
 		Double stimmenDouble = erg.getValue();
 		int stimmen = (new Double(stimmenDouble * 100.0)).intValue();
-		Slice s = Slice.newSlice(stimmen, null, parteiName + " (" + stimmenDouble + "%)", null);
+		Double stimmenRounded = new Double(stimmen) / 100;
+		Slice s = Slice.newSlice(stimmen, null, parteiName + " (" + stimmenRounded + "%)", null);
 		slices.add(s);
 	}
 	PieChart pieChart = GCharts.newPieChart(slices);
@@ -75,13 +80,14 @@
 	}
 	BarChartPlot plot = Plots.newBarChartPlot(DataUtil.scaleWithinRange(0, max, data));
 	BarChart barChart = GCharts.newBarChart(plot);
+	// this is necessary for making the bar graph horizontal!
+	Collections.reverse(labels);
 	barChart.addYAxisLabels(AxisLabelsFactory.newAxisLabels(labels));
 	barChart.addXAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, max));
-	barChart.setSize(250,250);
+	barChart.setSize(500, labels.size() * 40 + 50);
 	barChart.setTitle("Stimmverteilung (absolut)");
-	barChart.setBarWidth(50);
+	barChart.setBarWidth(30);
 	barChart.setHorizontal(true);
-	//barChart.setSpaceWithinGroupsOfBars(75);
 	String barChartUrl = barChart.toURLString();
 %>
 <p class="centered">
@@ -108,10 +114,9 @@
 	barChartDev.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(minDouble - 1.0, maxDouble + 1.0));
 	Double span = Math.abs(maxDouble - minDouble);
 	Double zeroLinePercent = Math.abs(minDouble) / span;
-	barChartDev.setSize(250,290);
+	barChartDev.setSize(labels.size() * 50,500);
 	barChartDev.setTitle("Stimmenentwicklung (prozentual)");
-	barChartDev.setBarWidth(50);
-	//barChartDev.setSpaceWithinGroupsOfBars(75);
+	barChartDev.setBarWidth(40);
 	String barChartDevUrl = barChartDev.toURLString();
 %>
 <p class="centered">

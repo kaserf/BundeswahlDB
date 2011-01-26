@@ -23,11 +23,12 @@ $('[for^="wahlkreisRadio"]').each(function(index) {
 });
 $('[name="wahlkreisRadio"]').each(function(index) {
 	var id = $(this).attr('value');
-	$(this).click(loadProfile(id));
+	$(this).click(function() {
+		loadProfile(id);
+	});
 });
 
 function loadProfile(id) {
-	System.alert("clicked "+id);
 	$('#selectedDisplay').slideDown(function() {
 		$('#wahlkreisProfile').fadeOut(function() {
 			$('#wahlkreisProfile').load('widgets/wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=' 
