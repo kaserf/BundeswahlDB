@@ -1,3 +1,17 @@
+--direktkandidaten die eine person waehlen kann
+with
+wk_wb as (SELECT wahlkreis, wahlbezirk FROM Wahlberechtigte WHERE ausweisnummer = 1),
+wk_kandidaten as (SELECT ausweisnummer, vorname, nachname, wkk.wahlkreis, wahlbezirk, partei FROM (kandidat_wahlkreis wk JOIN kandidat k ON wk.kandidat = k.ausweisnummer) wkk JOIN wk_wb wahlkreis ON wahlkreis.wahlkreis = wkk.wahlkreis)
+SELECT ausweisnummer, vorname, nachname, wahlkreis, wahlbezirk, kurzbezeichnung FROM wk_kandidaten wkk JOIN partei p ON wkk.partei = p.nummer;
+
+--parteien die eine person waehlen kann
+with
+wk_wb as (SELECT wahlkreis, wahlbezirk FROM Wahlberechtigte WHERE ausweisnummer = 1),
+wk_wb_bl as (SELECT wahlkreis, wahlbezirk, bl.nummer FROM (wk_wb w JOIN wahlkreis wk ON w.wahlkreis = wk.nummer) wahlkreis JOIN bundesland bl ON wahlkreis.bundesland = bl.nummer),
+parteien_bl as (SELECT l.partei, wahlkreis, wahlbezirk FROM wk_wb_bl wk_bl JOIN landesliste l ON l.bundesland = wk_bl.nummer)
+SELECT p.nummer, p.kurzbezeichnung, wahlkreis, wahlbezirk FROM parteien_bl pbl JOIN partei p ON pbl.partei = p.nummer;
+
+
 --knappste sieger (top 10 werden in java ausgewählt)
 with
 wdk as (SELECT wd.wahlkreis, pk.ausweisnummer, pk.partei, pk.kurzbezeichnung, pk.vorname, pk.nachname, wd.stimmenanzahl FROM (wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer WHERE wd.wahljahr = 2009),
