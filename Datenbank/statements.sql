@@ -1,3 +1,22 @@
+--knappste sieger (top 10 werden in java ausgewählt)
+with
+wdk as (SELECT wd.wahlkreis, pk.ausweisnummer, pk.partei, pk.kurzbezeichnung, pk.vorname, pk.nachname, wd.stimmenanzahl FROM (wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer WHERE wd.wahljahr = 2009),
+sieger as (SELECT * FROM wdk wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)),
+ohne_sieger as (SELECT * FROM wdk EXCEPT SELECT * FROM sieger),
+zweite as (SELECT * FROM ohne_sieger wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM ohne_sieger wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)),
+knappste_sieger as (SELECT s.wahlkreis, s.partei as sieger_p_nummer, s.vorname as sieger_v, s.nachname as sieger_n, s.kurzbezeichnung as sieger_partei, s.stimmenanzahl as sieger_stimmen, z.stimmenanzahl as zweiter_stimmen, z.vorname as zweiter_v, z.nachname as zweiter_n, z.partei as zweiter_p_nummer, z.kurzbezeichnung as zweiter_partei FROM sieger s join zweite z on s.wahlkreis = z.wahlkreis)
+SELECT * FROM knappste_sieger ORDER BY (sieger_stimmen - zweiter_stimmen) ASC;
+
+--knappste verlierer (top 10 werden in java ausgewählt)
+with
+wdk as (SELECT wd.wahlkreis, pk.ausweisnummer, pk.partei, pk.kurzbezeichnung, pk.vorname, pk.nachname, wd.stimmenanzahl FROM (wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON wd.kandidat = pk.ausweisnummer WHERE wd.wahljahr = 2009),
+sieger as (SELECT * FROM wdk wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)),
+parteien_ohne_sieger as (SELECT * FROM partei p WHERE p.nummer NOT IN (SELECT DISTINCT partei FROM sieger)),
+pos_kandidaten as (SELECT * FROM wdk WHERE partei IN (SELECT nummer FROM parteien_ohne_sieger)),
+knappste_verlierer as (SELECT posk.wahlkreis, posk.partei as verlierer_p_nummer, posk.vorname as verlierer_v, posk.nachname as verlierer_n, posk.kurzbezeichnung as verlierer_partei, posk.stimmenanzahl as verlierer_stimmen, s.stimmenanzahl as sieger_stimmen, s.vorname as sieger_v, s.nachname as sieger_n, s.kurzbezeichnung as sieger_partei FROM pos_kandidaten posk JOIN sieger s ON posk.wahlkreis = s.wahlkreis)
+SELECT * FROM knappste_verlierer ORDER BY (verlierer_stimmen - sieger_stimmen) DESC;
+
+
 --überhangmandate pro partei und bundesland
 with
 ergebnis_pro_wk as
