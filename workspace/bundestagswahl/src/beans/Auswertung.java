@@ -383,7 +383,7 @@ public class Auswertung {
 		List<KnappsterSieger> knappsteSieger = new ArrayList<KnappsterSieger>();
 		ResultSet result = stmt.executeQuery("select max(nummer) from partei");
 		result.next();
-		int max_partei = result.getInt(0);
+		int max_partei = result.getInt(1);
 		int parteien_count[] = new int[max_partei];
 
 		result = stmt
