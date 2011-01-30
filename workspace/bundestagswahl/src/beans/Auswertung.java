@@ -383,7 +383,7 @@ public class Auswertung {
 		List<KnappsterSieger> knappsteSieger = new ArrayList<KnappsterSieger>();
 		ResultSet result = stmt.executeQuery("select max(nummer) from partei");
 		result.next();
-		int max_partei = result.getInt(0);
+		int max_partei = result.getInt(1);
 		int parteien_count[] = new int[max_partei];
 
 		result = stmt
@@ -559,29 +559,54 @@ public class Auswertung {
 			throws SQLException {
 		Wahlzettelauswahl auswahl = new Wahlzettelauswahl();
 		List<Kandidat> kandidaten = new ArrayList<Kandidat>();
-		kandidaten.add(createKandidat("Mueller", "Hans", "SPD", 0));
-		kandidaten.add(createKandidat("Meier", "Horst", "FDP", 1));
-		kandidaten.add(createKandidat("Kaufmann", "Anna", "Gruene", 2));
-		kandidaten.add(createKandidat("Lieber", "Rudolf", "Piraten", 3));
-		kandidaten.add(createKandidat("Mustermann", "Frederik", "Die Rosanen",
-				4));
-		auswahl.setKandidaten(kandidaten);
-		auswahl.setWahlbezirk(1);
-		auswahl.setWahlkreis(2);
 		List<Partei> parteien = new ArrayList<Partei>();
-		parteien.add(new Partei(0, "SPD"));
-		parteien.add(new Partei(1, "FDP"));
-		parteien.add(new Partei(2, "Gruene"));
-		parteien.add(new Partei(3, "CDU"));
-		parteien.add(new Partei(4, "Die Grauen"));
+		int wahlbezirk = 0, wahlkreis = 0;
+		int ausweisnummer = 0;
+		try {
+			ausweisnummer = Integer.parseInt(persnr);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+		
+		initConnection();
+		Statement stmt = this.connection.createStatement();
+		ResultSet result = stmt
+			.executeQuery("with wk_wb as (SELECT wahlkreis, wahlbezirk FROM Wahlberechtigte WHERE ausweisnummer = " + ausweisnummer + "), " +
+					"wk_kandidaten as (SELECT ausweisnummer, vorname, nachname, wkk.wahlkreis, wahlbezirk, partei " +
+					"FROM (kandidat_wahlkreis wk JOIN kandidat k ON wk.kandidat = k.ausweisnummer) wkk " +
+					"JOIN wk_wb wahlkreis ON wahlkreis.wahlkreis = wkk.wahlkreis) " +
+					"SELECT ausweisnummer, vorname, nachname, wahlkreis, wahlbezirk, kurzbezeichnung " +
+					"FROM wk_kandidaten wkk JOIN partei p ON wkk.partei = p.nummer;");
+		
+		while (result.next()) {
+			wahlbezirk = result.getInt(5);
+			wahlkreis = result.getInt(4);
+			kandidaten.add(createKandidat(result.getString(3), result.getString(2), result.getString(6), result.getInt(1)));
+		}
+		
+		auswahl.setKandidaten(kandidaten);
+		auswahl.setWahlbezirk(wahlbezirk);
+		auswahl.setWahlkreis(wahlkreis);
+		
+		result = stmt
+			.executeQuery("with wk_wb as (SELECT wahlkreis, wahlbezirk FROM Wahlberechtigte WHERE ausweisnummer = " + ausweisnummer +
+					"), wk_wb_bl as (SELECT wahlkreis, wahlbezirk, bl.nummer FROM (wk_wb w JOIN wahlkreis wk ON w.wahlkreis = wk.nummer) wahlkreis " +
+					"JOIN bundesland bl ON wahlkreis.bundesland = bl.nummer), parteien_bl as (SELECT l.partei, wahlkreis, wahlbezirk " +
+					"FROM wk_wb_bl wk_bl JOIN landesliste l ON l.bundesland = wk_bl.nummer) SELECT p.nummer, p.kurzbezeichnung, wahlkreis, wahlbezirk " +
+					"FROM parteien_bl pbl JOIN partei p ON pbl.partei = p.nummer;");		
+		while (result.next()) {
+			parteien.add(new Partei(result.getInt(1), result.getString(2)));
+		}
+		
 		auswahl.setParteien(parteien);
+		freeConnection();
 		return auswahl;
 	}
 
 	public void setGewaehlt(int personalNummer) throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
-		stmt.executeQuery("update wahlberechtigte set gewaehlt = true where ausweisnummer = "
+		stmt.execute("update wahlberechtigte set gewaehlt = true where ausweisnummer = "
 				+ personalNummer);
 		freeConnection();
 	}
@@ -590,7 +615,7 @@ public class Auswertung {
 			int wahlkreis) throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
-		stmt.executeQuery("insert into wahlzettel (erststimme, zweitstimme, wahlbezirk, wahlkreis) values("
+		stmt.execute("insert into wahlzettel (erststimme, zweitstimme, wahlbezirk, wahlkreis) values("
 				+ kandidatId
 				+ ", "
 				+ parteiId
