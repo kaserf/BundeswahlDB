@@ -8,7 +8,7 @@ CREATE TABLE Partei (
 	name varchar(100)
 );
 
--- Enthält Beziehung ???
+-- Enthält Beziehung "ist Mitglied in"
 CREATE TABLE Kandidat (
 	ausweisnummer integer primary key,
 	vorname varchar(50),
@@ -67,7 +67,7 @@ CREATE TABLE Wahlergebnis (
 	wahlkreis integer REFERENCES Wahlkreis
 );
 
--- Enthält Beziehung "part of"
+-- Enthält Beziehung "Direkterg. part of"
 CREATE TABLE Direktergebnis (
 	id serial primary key,
 	stimmenanzahl integer,
@@ -76,7 +76,7 @@ CREATE TABLE Direktergebnis (
 	wahlergebnis integer REFERENCES Wahlergebnis
 );
 
--- Enthält Beziehung "part of"
+-- Enthält Beziehung "Listenerg. part of"
 CREATE TABLE Listenergebnis (
 	partei integer REFERENCES Partei,
 	stimmenanzahl integer,
@@ -95,6 +95,25 @@ CREATE TABLE Wahlzettel (
 
 );
 
+-- Hilfstabelle für Werte wie ungültige Stimmen, Wahlberechtigte, etc.
+-- Enthält Beziehung "Str. gehört zu"
+CREATE TABLE Struktur (
+	wahlkreis integer REFERENCES Wahlkreis,
+	jahr integer,
+	wahlberechtigte integer,
+	waehler integer,
+	ungueltig_erst integer,
+	ungueltig_zweit integer,
+	gueltig_erst integer,
+	gueltig_zweit integer,
+	primary key (wahlkreis, jahr)
+);
+
+-- Hilfstabelle für die Sitzplatzberechnung
+CREATE TABLE Divisor(
+	divisor decimal(4,1)
+);
+
 -- Beziehung "vertreten auf"
 CREATE TABLE Landesliste_Kandidat (
 	landesliste integer REFERENCES Landesliste,
@@ -111,26 +130,8 @@ CREATE TABLE Kandidat_Wahlkreis (
 	primary key (kandidat, wahlkreis)
 );
 
--- Tabelle für die gewählten Kandidaten (Kandidaten mit Sitze)
+-- Beziehung "gewählt in"
 CREATE TABLE Kandidaten_Gewaehlt (
 	kandidat integer primary key references Kandidat,
 	direktkandidat_wk integer references wahlkreis
-);
-
--- TODO: in doku eintragen
-CREATE TABLE Struktur (
-	wahlkreis integer REFERENCES Wahlkreis,
-	jahr integer,
-	wahlberechtigte integer,
-	waehler integer,
-	ungueltig_erst integer,
-	ungueltig_zweit integer,
-	gueltig_erst integer,
-	gueltig_zweit integer,
-	primary key (wahlkreis, jahr)
-);
-
--- Tabelle für die Divisoren
-CREATE TABLE Divisor(
-	divisor decimal(4,1)
 );
