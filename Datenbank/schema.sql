@@ -1,4 +1,4 @@
--- drop alle Tabellen
+﻿-- drop alle Tabellen
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
@@ -8,17 +8,12 @@ CREATE TABLE Partei (
 	name varchar(100)
 );
 
+-- Enthält Beziehung ???
 CREATE TABLE Kandidat (
 	ausweisnummer integer primary key,
 	vorname varchar(50),
 	nachname varchar(50),
-	--geburtsjahr zu date wechseln?
-	geburtsjahr varchar(4),
 	partei integer REFERENCES Partei
-	--strasse varchar(50),
-	--hausnummer integer,
-	--postleitzahl integer,
-	--stadt varchar(50)
 );
 
 CREATE TABLE Bundesland (
@@ -34,31 +29,13 @@ CREATE TABLE Wahlkreis (
 	bundesland integer REFERENCES Bundesland
 );
 
--- TODO: in doku eintragen
-CREATE TABLE Struktur (
-	wahlkreis integer REFERENCES Wahlkreis,
-	jahr integer,
-	wahlberechtigte integer,
-	waehler integer,
-	ungueltig_erst integer,
-	ungueltig_zweit integer,
-	gueltig_erst integer,
-	gueltig_zweit integer,
-	primary key (wahlkreis, jahr)
-);
-
 -- Enthält Beziehung "WB liegt in"
 CREATE TABLE Wahlbezirk (
 	nummer integer,
-	--name varchar(50),
-	--wahlvorstand varchar(50),
-	--strasse varchar(50),
-	--hausnummer integer,
-	--postleitzahl integer,
-	--stadt varchar,
 	wahlkreis integer REFERENCES Wahlkreis,
 	primary key (nummer, wahlkreis)
 );
+
 -- Enthält Beziehung "gehört zu", "aufgestellt für"
 CREATE TABLE Landesliste (
 	id integer primary key,
@@ -72,8 +49,7 @@ CREATE TABLE Wahlberechtigte (
 	ausweisnummer serial primary key,
 	--vorname varchar(50),
 	--nachname varchar(50),
-	--geburtsdatum als DATE?
-	--geburtsdatum varchar(10),
+	--geburtsdatum date,
 	--strasse varchar(50),
 	--hausnummer integer,
 	--postleitzahl integer,
@@ -92,18 +68,15 @@ CREATE TABLE Wahlergebnis (
 );
 
 -- Enthält Beziehung "part of"
--- TODO: Referenzierung in der Doku ergänzen
 CREATE TABLE Direktergebnis (
 	id serial primary key,
+	stimmenanzahl integer,
 	kandidat integer REFERENCES Kandidat,
 	partei integer REFERENCES Partei,
-	stimmenanzahl integer,
 	wahlergebnis integer REFERENCES Wahlergebnis
-	--primary key (kandidat, wahlergebnis)
 );
 
 -- Enthält Beziehung "part of"
--- TODO: Referenzierung in der Doku ergänzen
 CREATE TABLE Listenergebnis (
 	partei integer REFERENCES Partei,
 	stimmenanzahl integer,
@@ -142,6 +115,19 @@ CREATE TABLE Kandidat_Wahlkreis (
 CREATE TABLE Kandidaten_Gewaehlt (
 	kandidat integer primary key references Kandidat,
 	direktkandidat_wk integer references wahlkreis
+);
+
+-- TODO: in doku eintragen
+CREATE TABLE Struktur (
+	wahlkreis integer REFERENCES Wahlkreis,
+	jahr integer,
+	wahlberechtigte integer,
+	waehler integer,
+	ungueltig_erst integer,
+	ungueltig_zweit integer,
+	gueltig_erst integer,
+	gueltig_zweit integer,
+	primary key (wahlkreis, jahr)
 );
 
 -- Tabelle für die Divisoren
