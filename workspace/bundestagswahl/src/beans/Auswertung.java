@@ -340,7 +340,9 @@ public class Auswertung {
 		return sieger;
 	}
 
-	/** Q5: Ueberhangmandate */
+	/**
+	 * Q5: Ueberhangmandate
+	 */
 	public List<Ueberhangmandate> getUeberhangmandate() throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
@@ -373,9 +375,7 @@ public class Auswertung {
 
 	/** Q6: Knappste Sieger */
 	/**
-	 * TODO: Implement Query in SQL; don't forget initConnection() and
-	 * freeConnection() :)
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public List<KnappsterSieger> getKnappsteSieger() throws SQLException {
 		initConnection();
@@ -385,66 +385,81 @@ public class Auswertung {
 		result.next();
 		int max_partei = result.getInt(0);
 		int parteien_count[] = new int[max_partei];
-		
-		result = stmt.executeQuery("with wdk as (SELECT wd.wahlkreis, pk.ausweisnummer, pk.partei, pk.kurzbezeichnung, pk.vorname, pk.nachname, wd.stimmenanzahl " +
-				"FROM (wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON " +
-				"wd.kandidat = pk.ausweisnummer WHERE wd.wahljahr = 2009), " +
-				"sieger as (SELECT * FROM wdk wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)), " +
-				"ohne_sieger as (SELECT * FROM wdk EXCEPT SELECT * FROM sieger), " +
-				"zweite as (SELECT * FROM ohne_sieger wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) " +
-				"FROM ohne_sieger wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)), " +
-				"knappste_sieger as (SELECT s.wahlkreis, s.partei as sieger_p_nummer, s.vorname as sieger_v, s.nachname as sieger_n, " +
-				"s.kurzbezeichnung as sieger_partei, s.stimmenanzahl as sieger_stimmen, z.stimmenanzahl as zweiter_stimmen, " +
-				"z.vorname as zweiter_v, z.nachname as zweiter_n, z.partei as zweiter_p_nummer, z.kurzbezeichnung as zweiter_partei " +
-				"FROM sieger s join zweite z on s.wahlkreis = z.wahlkreis) " +
-				"SELECT * FROM knappste_sieger ORDER BY (sieger_stimmen - zweiter_stimmen) ASC;");
-		while(result.next()) {
-			if (parteien_count[result.getInt("sieger_p_nummer")-1] == 10)
+
+		result = stmt
+				.executeQuery("with wdk as (SELECT wd.wahlkreis, pk.ausweisnummer, pk.partei, pk.kurzbezeichnung, pk.vorname, pk.nachname, wd.stimmenanzahl "
+						+ "FROM (wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk ON "
+						+ "wd.kandidat = pk.ausweisnummer WHERE wd.wahljahr = 2009), "
+						+ "sieger as (SELECT * FROM wdk wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) FROM wdk wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)), "
+						+ "ohne_sieger as (SELECT * FROM wdk EXCEPT SELECT * FROM sieger), "
+						+ "zweite as (SELECT * FROM ohne_sieger wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) "
+						+ "FROM ohne_sieger wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)), "
+						+ "knappste_sieger as (SELECT s.wahlkreis, s.partei as sieger_p_nummer, s.vorname as sieger_v, s.nachname as sieger_n, "
+						+ "s.kurzbezeichnung as sieger_partei, s.stimmenanzahl as sieger_stimmen, z.stimmenanzahl as zweiter_stimmen, "
+						+ "z.vorname as zweiter_v, z.nachname as zweiter_n, z.partei as zweiter_p_nummer, z.kurzbezeichnung as zweiter_partei "
+						+ "FROM sieger s join zweite z on s.wahlkreis = z.wahlkreis) "
+						+ "SELECT * FROM knappste_sieger ORDER BY (sieger_stimmen - zweiter_stimmen) ASC;");
+		while (result.next()) {
+			if (parteien_count[result.getInt("sieger_p_nummer") - 1] == 10)
 				continue;
 			Einzelergebnis<Kandidat, Integer> sieger = new Einzelergebnis<Kandidat, Integer>(
-					new Kandidat(result.getString("sieger_n"), result.getString("sieger_v"), new Partei(result.getString("sieger_partei")), result.getInt("wahlkreis"),
-							null, 0), result.getInt("sieger_stimmen"));
+					new Kandidat(result.getString("sieger_n"),
+							result.getString("sieger_v"), new Partei(
+									result.getString("sieger_partei")),
+							result.getInt("wahlkreis"), null, 0),
+					result.getInt("sieger_stimmen"));
 			Einzelergebnis<Kandidat, Integer> verlierer = new Einzelergebnis<Kandidat, Integer>(
-					new Kandidat(result.getString("zweiter_n"), result.getString("zweiter_v"), new Partei(result.getString("zweiter_partei")), result.getInt("wahlkreis"),
-							null, 0), result.getInt("zweiter_stimmen"));
-			KnappsterSieger knSieger = new KnappsterSieger(result.getString("sieger_partei"), sieger,
-					verlierer);
+					new Kandidat(result.getString("zweiter_n"),
+							result.getString("zweiter_v"), new Partei(
+									result.getString("zweiter_partei")),
+							result.getInt("wahlkreis"), null, 0),
+					result.getInt("zweiter_stimmen"));
+			KnappsterSieger knSieger = new KnappsterSieger(
+					result.getString("sieger_partei"), sieger, verlierer);
 			knappsteSieger.add(knSieger);
-			parteien_count[result.getInt("sieger_p_nummer")-1]++;
+			parteien_count[result.getInt("sieger_p_nummer") - 1]++;
 		}
-		
-		result = stmt.executeQuery("with wdk as (SELECT wd.wahlkreis, pk.ausweisnummer, pk.partei, pk.kurzbezeichnung, pk.vorname, pk.nachname, wd.stimmenanzahl " +
-				"FROM (wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk " +
-				"ON wd.kandidat = pk.ausweisnummer WHERE wd.wahljahr = 2009), " +
-				"sieger as (SELECT * FROM wdk wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) " +
-				"FROM wdk wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)), " +
-				"parteien_ohne_sieger as (SELECT * FROM partei p WHERE p.nummer NOT IN (SELECT DISTINCT partei FROM sieger)), " +
-				"pos_kandidaten as (SELECT * FROM wdk WHERE partei IN (SELECT nummer FROM parteien_ohne_sieger)), " +
-				"knappste_verlierer as (SELECT posk.wahlkreis, posk.partei as verlierer_p_nummer, posk.vorname as verlierer_v, " +
-				"posk.nachname as verlierer_n, posk.kurzbezeichnung as verlierer_partei, posk.stimmenanzahl as verlierer_stimmen, " +
-				"s.stimmenanzahl as sieger_stimmen, s.vorname as sieger_v, s.nachname as sieger_n, s.kurzbezeichnung as sieger_partei " +
-				"FROM pos_kandidaten posk JOIN sieger s ON posk.wahlkreis = s.wahlkreis) " +
-				"SELECT * FROM knappste_verlierer ORDER BY (verlierer_stimmen - sieger_stimmen) DESC;");
-		while(result.next()) {
-			if (parteien_count[result.getInt("verlierer_p_nummer")-1] == 10)
+
+		result = stmt
+				.executeQuery("with wdk as (SELECT wd.wahlkreis, pk.ausweisnummer, pk.partei, pk.kurzbezeichnung, pk.vorname, pk.nachname, wd.stimmenanzahl "
+						+ "FROM (wahlergebnis w JOIN direktergebnis d ON w.id = d.wahlergebnis) wd JOIN (kandidat k JOIN partei p ON p.nummer = k.partei) pk "
+						+ "ON wd.kandidat = pk.ausweisnummer WHERE wd.wahljahr = 2009), "
+						+ "sieger as (SELECT * FROM wdk wdk_1 WHERE wdk_1.stimmenanzahl = (SELECT MAX(stimmenanzahl) "
+						+ "FROM wdk wdk_2 WHERE wdk_1.wahlkreis=wdk_2.wahlkreis)), "
+						+ "parteien_ohne_sieger as (SELECT * FROM partei p WHERE p.nummer NOT IN (SELECT DISTINCT partei FROM sieger)), "
+						+ "pos_kandidaten as (SELECT * FROM wdk WHERE partei IN (SELECT nummer FROM parteien_ohne_sieger)), "
+						+ "knappste_verlierer as (SELECT posk.wahlkreis, posk.partei as verlierer_p_nummer, posk.vorname as verlierer_v, "
+						+ "posk.nachname as verlierer_n, posk.kurzbezeichnung as verlierer_partei, posk.stimmenanzahl as verlierer_stimmen, "
+						+ "s.stimmenanzahl as sieger_stimmen, s.vorname as sieger_v, s.nachname as sieger_n, s.kurzbezeichnung as sieger_partei "
+						+ "FROM pos_kandidaten posk JOIN sieger s ON posk.wahlkreis = s.wahlkreis) "
+						+ "SELECT * FROM knappste_verlierer ORDER BY (verlierer_stimmen - sieger_stimmen) DESC;");
+		while (result.next()) {
+			if (parteien_count[result.getInt("verlierer_p_nummer") - 1] == 10)
 				continue;
 			Einzelergebnis<Kandidat, Integer> sieger = new Einzelergebnis<Kandidat, Integer>(
-					new Kandidat(result.getString("sieger_n"), result.getString("sieger_v"), new Partei(result.getString("sieger_partei")), result.getInt("wahlkreis"),
-							null, 0), result.getInt("sieger_stimmen"));
+					new Kandidat(result.getString("sieger_n"),
+							result.getString("sieger_v"), new Partei(
+									result.getString("sieger_partei")),
+							result.getInt("wahlkreis"), null, 0),
+					result.getInt("sieger_stimmen"));
 			Einzelergebnis<Kandidat, Integer> verlierer = new Einzelergebnis<Kandidat, Integer>(
-					new Kandidat(result.getString("verlierer_n"), result.getString("verlierer_v"), new Partei(result.getString("verlierer_partei")), result.getInt("wahlkreis"),
-							null, 0), result.getInt("verlierer_stimmen"));
-			KnappsterSieger knSieger = new KnappsterSieger(result.getString("verlierer_partei"), sieger,
-					verlierer);
+					new Kandidat(result.getString("verlierer_n"),
+							result.getString("verlierer_v"), new Partei(
+									result.getString("verlierer_partei")),
+							result.getInt("wahlkreis"), null, 0),
+					result.getInt("verlierer_stimmen"));
+			KnappsterSieger knSieger = new KnappsterSieger(
+					result.getString("verlierer_partei"), sieger, verlierer);
 			knappsteSieger.add(knSieger);
-			parteien_count[result.getInt("verlierer_p_nummer")-1]++;
+			parteien_count[result.getInt("verlierer_p_nummer") - 1]++;
 		}
 		freeConnection();
 		return knappsteSieger;
 	}
 
 	/** Q7: Wahlkreisuebersicht (Einzelstimmen) */
-	public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(int id) throws SQLException {
+	public WahlkreisUebersicht getWahlkreisUebersichtEinzelstimmen(int id)
+			throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
 		String wk_name;
@@ -452,30 +467,34 @@ public class Auswertung {
 		List<Einzelergebnis<Partei, Double>> stimmenEntwicklung = new ArrayList<Einzelergebnis<Partei, Double>>();
 		List<Einzelergebnis<Partei, Double>> stimmenProzentual = new ArrayList<Einzelergebnis<Partei, Double>>();
 		ResultSet result = stmt
-				.executeQuery("SELECT (CAST (anz_gew as float)/anz_ber) * 100 as Beteiligung " +
-						"FROM (SELECT COUNT(*) as anz_gew FROM Wahlberechtigte WHERE gewaehlt = true AND wahlkreis = " + id +
-						") AS gewaehlt_kreis, (SELECT COUNT(*) as anz_ber FROM Wahlberechtigte WHERE wahlkreis = 55) AS berechtigte_kreis;");
+				.executeQuery("SELECT (CAST (anz_gew as float)/anz_ber) * 100 as Beteiligung "
+						+ "FROM (SELECT COUNT(*) as anz_gew FROM Wahlberechtigte WHERE gewaehlt = true AND wahlkreis = "
+						+ id
+						+ ") AS gewaehlt_kreis, (SELECT COUNT(*) as anz_ber FROM Wahlberechtigte WHERE wahlkreis = 55) AS berechtigte_kreis;");
 		result.next();
 		double wahlbeteiligung = result.getDouble(1);
-		
+
 		result = stmt.executeQuery("SELECT name FROM wahlkreis WHERE nummer = "
 				+ id);
 		result.next();
 		wk_name = result.getString(1);
 
 		result = stmt
-				.executeQuery("with stimmen_pro_partei as (select zweitstimme as partei, COUNT(*) as stimmenanzahl FROM Wahlzettel WHERE Wahlkreis = " + id +
-						" GROUP BY zweitstimme), " +
-						"gesamt09 as (select SUM(stimmenanzahl) as gesamt from stimmen_pro_partei), " +
-						"gesamt05 as (select gueltig_zweit as gesamt from struktur where wahlkreis = " + id +
-						" and jahr = 2005), " +
-						"old_prozente as (select l2.partei, cast(l2.stimmenanzahl as float)/gesamt05.gesamt as vor_stimmen from gesamt05, " +
-						"listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2005 and w2.wahlkreis = " + id +
-						"), new_prozente as (select spp.partei, cast(spp.stimmenanzahl as float)/gesamt09.gesamt as vor_stimmen from gesamt09, " +
-						"stimmen_pro_partei spp) select p.kurzbezeichnung, spp.stimmenanzahl as stimmen, old_prozente.vor_stimmen * 100 as prozente_old, " +
-						"new_prozente.vor_stimmen * 100 as prozente_new, (new_prozente.vor_stimmen - old_prozente.vor_stimmen) * 100 as prozente_diff " +
-						"from stimmen_pro_partei spp join partei p on spp.partei = p.nummer, old_prozente, new_prozente where old_prozente.partei = spp.partei " +
-						"and new_prozente.partei = spp.partei;");
+				.executeQuery("with stimmen_pro_partei as (select zweitstimme as partei, COUNT(*) as stimmenanzahl FROM Wahlzettel WHERE Wahlkreis = "
+						+ id
+						+ " GROUP BY zweitstimme), "
+						+ "gesamt09 as (select SUM(stimmenanzahl) as gesamt from stimmen_pro_partei), "
+						+ "gesamt05 as (select gueltig_zweit as gesamt from struktur where wahlkreis = "
+						+ id
+						+ " and jahr = 2005), "
+						+ "old_prozente as (select l2.partei, cast(l2.stimmenanzahl as float)/gesamt05.gesamt as vor_stimmen from gesamt05, "
+						+ "listenergebnis l2 join wahlergebnis w2 on l2.wahlergebnis = w2.id where w2.wahljahr = 2005 and w2.wahlkreis = "
+						+ id
+						+ "), new_prozente as (select spp.partei, cast(spp.stimmenanzahl as float)/gesamt09.gesamt as vor_stimmen from gesamt09, "
+						+ "stimmen_pro_partei spp) select p.kurzbezeichnung, spp.stimmenanzahl as stimmen, old_prozente.vor_stimmen * 100 as prozente_old, "
+						+ "new_prozente.vor_stimmen * 100 as prozente_new, (new_prozente.vor_stimmen - old_prozente.vor_stimmen) * 100 as prozente_diff "
+						+ "from stimmen_pro_partei spp join partei p on spp.partei = p.nummer, old_prozente, new_prozente where old_prozente.partei = spp.partei "
+						+ "and new_prozente.partei = spp.partei;");
 		while (result.next()) {
 			stimmenAbsolut.add(new Einzelergebnis<Partei, Integer>(new Partei(
 					result.getString(1)), Integer.valueOf(result.getInt(2))));
@@ -488,10 +507,12 @@ public class Auswertung {
 		}
 
 		result = stmt
-				.executeQuery("WITH stimmen_pro_kandidat (kandidat, anz) AS (SELECT erststimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = " + id +
-						" GROUP BY erststimme), stimmen_pro_partei (partei_nr, anz_p) AS (SELECT zweitstimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = " + id +
-						" GROUP BY zweitstimme) SELECT vorname, nachname, kurzbezeichnung FROM Kandidat k join Partei p on p.nummer = k.partei " +
-						"WHERE ausweisnummer = (SELECT kandidat FROM stimmen_pro_kandidat WHERE anz = (SELECT MAX(anz) FROM stimmen_pro_kandidat));");
+				.executeQuery("WITH stimmen_pro_kandidat (kandidat, anz) AS (SELECT erststimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = "
+						+ id
+						+ " GROUP BY erststimme), stimmen_pro_partei (partei_nr, anz_p) AS (SELECT zweitstimme, COUNT(*) FROM Wahlzettel WHERE Wahlkreis = "
+						+ id
+						+ " GROUP BY zweitstimme) SELECT vorname, nachname, kurzbezeichnung FROM Kandidat k join Partei p on p.nummer = k.partei "
+						+ "WHERE ausweisnummer = (SELECT kandidat FROM stimmen_pro_kandidat WHERE anz = (SELECT MAX(anz) FROM stimmen_pro_kandidat));");
 		result.next();
 
 		String vorname = result.getString(1);
@@ -507,16 +528,21 @@ public class Auswertung {
 		return ret;
 	}
 
-	/** Check whether Personalnummer is valid.
-	 * @throws SQLException */
+	/**
+	 * Check whether Personalnummer is valid.
+	 * 
+	 * @throws SQLException
+	 */
 	public boolean checkPersNr(String persNr) throws SQLException {
 		initConnection();
 		boolean ret = false;
-		
+
 		try {
 			int ausweisnr = Integer.parseInt(persNr);
 			Statement stmt = this.connection.createStatement();
-			ResultSet result = stmt.executeQuery("select * from wahlberechtigte where ausweisnummer = " + ausweisnr + " and gewaehlt = false");
+			ResultSet result = stmt
+					.executeQuery("select * from wahlberechtigte where ausweisnummer = "
+							+ ausweisnr + " and gewaehlt = false");
 			if (result.next())
 				ret = true;
 			else
@@ -529,7 +555,8 @@ public class Auswertung {
 	}
 
 	/** Return Kandidats and Landeslists for an id of a citizen. */
-	public Wahlzettelauswahl getWahlzettelauswahl(String persnr) {
+	public Wahlzettelauswahl getWahlzettelauswahl(String persnr)
+			throws SQLException {
 		Wahlzettelauswahl auswahl = new Wahlzettelauswahl();
 		List<Kandidat> kandidaten = new ArrayList<Kandidat>();
 		kandidaten.add(createKandidat("Mueller", "Hans", "SPD", 0));
@@ -539,6 +566,8 @@ public class Auswertung {
 		kandidaten.add(createKandidat("Mustermann", "Frederik", "Die Rosanen",
 				4));
 		auswahl.setKandidaten(kandidaten);
+		auswahl.setWahlbezirk(1);
+		auswahl.setWahlkreis(2);
 		List<Partei> parteien = new ArrayList<Partei>();
 		parteien.add(new Partei(0, "SPD"));
 		parteien.add(new Partei(1, "FDP"));
@@ -552,14 +581,23 @@ public class Auswertung {
 	public void setGewaehlt(int personalNummer) throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
-		stmt.executeQuery("update wahlberechtigte set gewaehlt = true where ausweisnummer = " + personalNummer);
+		stmt.executeQuery("update wahlberechtigte set gewaehlt = true where ausweisnummer = "
+				+ personalNummer);
 		freeConnection();
 	}
 
-	public void setWahlzettel(int kandidatId, int parteiId) {
+	public void setWahlzettel(int kandidatId, int parteiId, int wahlbezirk,
+			int wahlkreis) throws SQLException {
 		initConnection();
 		Statement stmt = this.connection.createStatement();
-		stmt.executeQuery("insert into wahlzettel (erststimme, zweitstimme, wahlbezirk, wahlkreis) values(" + kandidatId + ", " + parteiId + ", " + wahlbezirk + ", " + wahlkreis + ")");
+		stmt.executeQuery("insert into wahlzettel (erststimme, zweitstimme, wahlbezirk, wahlkreis) values("
+				+ kandidatId
+				+ ", "
+				+ parteiId
+				+ ", "
+				+ wahlbezirk
+				+ ", "
+				+ wahlkreis + ")");
 		freeConnection();
 	}
 }

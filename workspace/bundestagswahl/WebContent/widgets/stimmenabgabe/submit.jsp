@@ -7,7 +7,9 @@
 	int kandidatId = Integer.parseInt(request.getParameter("kandidatId"));
 	int parteiId = Integer.parseInt(request.getParameter("parteiId"));
 	int persnr = Integer.parseInt(request.getParameter("persNr"));
+	int wahlkreis = Integer.parseInt(request.getParameter("wahlkreis"));
+	int wahlbezirk = Integer.parseInt(request.getParameter("wahlbezirk"));
 	auswertung.setGewaehlt(persnr);
-	auswertung.setWahlzettel(kandidatId, parteiId);
+	auswertung.setWahlzettel(kandidatId, parteiId, wahlkreis, wahlbezirk);
 %>
 <h3>Danke für Ihre Stimmabgabe!</h3>

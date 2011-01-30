@@ -75,7 +75,7 @@
 		else {
 			$('#wahlzettel').slideUp(function() {
 				$('#wahlzettel').load("widgets/stimmenabgabe/submit.jsp?kandidatId=" 
-						+ kandidatId + "&parteiId=" + parteiId + "&persNr=" + <%= persnr %>, function() {
+						+ kandidatId + "&parteiId=" + parteiId + "&persNr=" + <%= persnr %> + "&wahlkreis=" + <%= auswahl.getWahlkreis()%> + "&wahlbezirk=" + <%= auswahl.getWahlbezirk()%>, function() {
 					$('#wahlzettel').slideDown();
 				});
 			});

@@ -4,6 +4,9 @@ import java.util.List;
 
 public class Wahlzettelauswahl {
 
+	private int wahlbezirk;
+	private int wahlkreis;
+
 	private List<Kandidat> kandidaten;
 
 	private List<Partei> parteien;
@@ -25,6 +28,22 @@ public class Wahlzettelauswahl {
 
 	public List<Partei> getParteien() {
 		return parteien;
+	}
+
+	public void setWahlbezirk(int wahlbezirk) {
+		this.wahlbezirk = wahlbezirk;
+	}
+
+	public int getWahlbezirk() {
+		return wahlbezirk;
+	}
+
+	public void setWahlkreis(int wahlkreis) {
+		this.wahlkreis = wahlkreis;
+	}
+
+	public int getWahlkreis() {
+		return wahlkreis;
 	}
 
 }
