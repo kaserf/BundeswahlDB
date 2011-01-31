@@ -75,7 +75,7 @@ INSERT INTO Kandidaten_Gewaehlt
 		group by D.Partei,D.Bundesland
 		order by D.Partei
 	),
-	--Direktmandate berechnen
+	--Direktmandate pro partei und bundesland berechnen, natürlich nur für jene mit partei (partei = 99 sind parteilose)
 	direktmandate_parteien_bundesland as
 	(
 		select K.Partei, W.Bundesland, count(*) as Direktmandate
@@ -83,14 +83,14 @@ INSERT INTO Kandidaten_Gewaehlt
 		where not G.direktkandidat_wk is null and G.direktkandidat_wk=W.Nummer and G.Kandidat=K.ausweisnummer and K.Partei <> 99
 		group by K.Partei,W.Bundesland
 	),
-	--Überhangmandate berechnen
+	--Überhangmandate berechnen (anzahl der direktmandate pro partei minus anzahl sitze die der partei zugesprochen wurden durch höchstzahlverfahren)
 	ueberhangmandate_parteien_bundesland as
 	(
 		select D.Partei, D.Bundesland,
 		(case when M.Direktmandate - D.Sitze > 0 then M.Direktmandate - D.Sitze else 0 end) as Ueberhangmandate
 		from parteien_bundesland_sitze D left outer join direktmandate_parteien_bundesland M on D.Partei=M.Partei and D.Bundesland=M.Bundesland
 	),
-	--Gesamtsitze berechnen
+	--Gesamtsitze berechnen (berechnete sitze durch höchstzahlverfahren plus die überhangmandate)
 	gesamtsitze_parteien_bundesland as
 	(
 		select S.Partei,S.Bundesland, S.Sitze + U.Ueberhangmandate as Sitze
