@@ -35,7 +35,7 @@
 	<div>
 	<p>
 		<span style="font-size: 18pt;"><%= i %>.</span> Wahlkreis <%= siegerKandidat.getWahlkreis()%>
-		<div align="center" class="ui-state-highlight ui-widget" style="width:80%">
+		<div align="center" class="ui-state-highlight ui-widget" style="width:95%">
 		<p>
 		<span><%= siegerKandidat.getVorname() + " " + siegerKandidat.getName() 
 			+ " (" + siegerKandidat.getPartei().getName() + ")" %></span>

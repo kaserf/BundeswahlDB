@@ -8,11 +8,7 @@ from psycopg2 import extras
 # Richtiges Bundesland hier eintragen!#
 bundesland = 'Bremen'
 #######################################
-
-try:
-    conn = psycopg2.connect("dbname='Bundestagswahl'")
-except:
-    print "I am unable to connect to the database"
+conn = psycopg2.connect("dbname='Bundestagswahl' user=postgres password=admin")
 
 cur = conn.cursor(cursor_factory=extras.DictCursor)
 

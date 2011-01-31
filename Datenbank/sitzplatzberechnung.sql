@@ -34,13 +34,6 @@ INSERT INTO Kandidaten_Gewaehlt
 		from Struktur
 		where jahr = 2009
 	),
---	struktur_bundesland as
---	(
---		select w.bundesland, sum(s.gueltig_zweit) as gueltige_stimmen
---		from Struktur s join Wahlkreis w on s.wahlkreis = w.nummer
---		where jahr = 2009
---		group by w.bundesland
---	)
 	parteien_deutschland as
 	(
 		select Partei, sum(stimmenanzahl) as partei_stimmen, cast(sum(stimmenanzahl) as float)/(select gueltige_stimmen from struktur_deutschland) as prozente
@@ -117,28 +110,8 @@ INSERT INTO Kandidaten_Gewaehlt
 		where L.Id=LK.Landesliste
 			and not exists(select * from Kandidaten_Gewaehlt G where G.Kandidat=LK.Kandidat)
 	)
-
-	--restlichen kandidaten eintragen
+	--restlichen Kandidaten eintragen
 	select L.Kandidat, null
 	from Index_Landeslisten L, landeslistenplaetze_parteien_bundesland P
 	where L.Partei=P.Partei and L.Bundesland=P.Bundesland and L.Rang <= P.Listenplaetze
-	
---	ueber_huerde as
---	(
---		select Partei, partei_stimmen
---		from parteien_deutschland
---		where prozente >= 0.05
---	),
-
---	summe_ueber_huerde_stimmen as
---	(
---		select cast(sum(partei_stimmen) as double precision) as gesamtstimmen
---		from ueber_huerde
---	),
-
---	parteien_angepasst as
---	(
---		select Partei, partei_stimmen, prozente/(select gesamtstimmen from summe_ueber_huerde_stimmen) as prozente_angepasst
---		from parteien_deutschland
---	),
 );

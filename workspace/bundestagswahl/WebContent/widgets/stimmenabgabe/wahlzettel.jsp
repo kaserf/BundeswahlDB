@@ -69,7 +69,7 @@
 	$('#abgabe').click(function(){
 		var kandidatId = $("input[name='erststimmeRadio']:checked").val();
 		var parteiId = $("input[name='zweitstimmeRadio']:checked").val();
-		if (kandidatId == undefined && parteiId == undefined) {
+		if (kandidatId == undefined || parteiId == undefined) {
 			$("#errorDialog").dialog('open');
 		}
 		else {

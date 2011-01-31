@@ -1,7 +1,7 @@
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -12,13 +12,52 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author kaserf
  */
 public class Benchmark {
-	static final int DELAY = 1000;
-	static final int WORKERS = 50;
-	static final String FILE_PATH = "C:\\Users\\Eva\\Uni\\WS 1011\\Datenbanken\\BundeswahlDB\\Benchmark\\Results\\result-"
+	static int WORKERS = 1;
+	static String FILE_PATH = "C:\\Users\\Eva\\Uni\\WS 1011\\Datenbanken\\BundeswahlDB\\Benchmark\\Results\\result-"
 			+ System.currentTimeMillis() + ".csv";
-	static final int MULTIPLIER = 20;
+
+	static int RUNTIME = 1000 * 60; // 20 seconds in millis.
+
+	static int WAITING_TIME = 0;
+
+	static Map<String, Integer> urlQuantityMap = new HashMap<String, Integer>();
+
+	private static void parseArgs(String[] args) {
+		String infoMessage = "Valid arguments are: --workers=<number of workers> "
+				+ "--file_path=<path> --wait=<waiting time in millis> and --runtime=<runtime in millis> --url=<url>,<percent>";
+		if (args.length == 1 && args[0].equals("--help")) {
+			System.out.println(infoMessage);
+			System.exit(0);
+		}
+		for (String arg : args) {
+			if (!arg.contains("=") || !arg.startsWith("--")) {
+				throw new RuntimeException(infoMessage);
+			} else {
+				String argName = arg.split("=", 2)[0];
+				String argValue = arg.split("=", 2)[1];
+				argName = argName.substring(2);
+				System.out.println("Found arg: " + argName);
+				if (argName.equals("workers")) {
+					WORKERS = Integer.parseInt(argValue);
+				} else if (argName.equals("wait")) {
+					WAITING_TIME = Integer.parseInt(argValue);
+				} else if (argName.equals("file_path")) {
+					FILE_PATH = argValue;
+				} else if (argName.equals("runtime")) {
+					RUNTIME = Integer.parseInt(argValue);
+				} else if (argName.equals("url")) {
+					String url = argValue.split(",")[0];
+					int percent = Integer.parseInt(argValue.split(",")[1]);
+					urlQuantityMap.put(url, percent);
+				} else {
+					throw new RuntimeException(infoMessage);
+				}
+			}
+		}
+	}
 
 	public static void main(String[] args) {
+		parseArgs(args);
 		// start log queue
 		BlockingQueue<LogEntry> logQueue = new LinkedBlockingQueue<LogEntry>();
 		LogSaver logSaver = new LogSaver(logQueue, FILE_PATH,
@@ -27,38 +66,40 @@ public class Benchmark {
 		logThread.start();
 
 		// create CardDeck
-		Map<String, Integer> urlQuantityMap = new HashMap<String, Integer>();
-		urlQuantityMap.put("sitzverteilung.jsp", 25);
-		urlQuantityMap.put("mitglieder.jsp", 10);
-		urlQuantityMap.put(
-				"wahlkreisuebersicht/wahlkreisprofile.jsp?wahlkreis=24", 25);
-		// urlQuantityMap.put("wahlkreissieger.jsp", 10);
-		urlQuantityMap.put(
-				"ueberhangmandate/ueberhangmandattabelle.jsp?bundesland=1", 10);
-		// urlQuantityMap.put("knappstesieger/top10.jsp?partei=3", 20);
-		CardDeck cardDeck = new CardDeck(urlQuantityMap, MULTIPLIER);
+		if (urlQuantityMap.isEmpty()) {
+			urlQuantityMap.put("sitzverteilung.jsp", 25);
+			urlQuantityMap.put("mitglieder.jsp", 10);
+			urlQuantityMap
+					.put("wahlkreisuebersicht/wahlkreisprofile.jsp?live=false&wahlkreis=24",
+							25);
+			urlQuantityMap.put("wahlkreissieger.jsp", 10);
+			urlQuantityMap.put(
+					"ueberhangmandate/ueberhangmandattabelle.jsp?bundesland=1",
+					10);
+			urlQuantityMap.put("knappstesieger/top10.jsp?partei=3", 20);
+			// This would be the URL for Q7:
+			// urlQuantityMap
+			// .put("wahlkreisuebersicht/wahlkreisprofile.jsp?live=true&wahlkreis=26",
+			// 25);
+		}
+		long finishTime = System.currentTimeMillis() + RUNTIME;
 
 		// start card queue
-		BlockingQueue<Card> cardQueue = new LinkedBlockingQueue<Card>();
-		cardQueue.addAll(cardDeck.getCards());
-		List<UrlWorker> threadPool = new ArrayList<UrlWorker>();
+		Queue<Thread> workerThreads = new LinkedList<Thread>();
 		for (int i = 0; i < WORKERS; i++) {
-			UrlWorker urlWorker = new UrlWorker(cardQueue, logQueue);
-			threadPool.add(urlWorker);
+			UrlWorker urlWorker = new UrlWorker(urlQuantityMap, finishTime,
+					WAITING_TIME, logQueue);
 			Thread urlThread = new Thread(urlWorker);
 			urlThread.start();
+			workerThreads.add(urlThread);
 		}
 
-		while (!cardQueue.isEmpty()) {
+		while (!workerThreads.isEmpty()) {
 			try {
-				Thread.sleep(DELAY);
+				workerThreads.poll().join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
-
-		for (UrlWorker worker : threadPool) {
-			worker.setStop(true);
 		}
 		logSaver.setStop(true);
 	}

@@ -55,7 +55,7 @@ public class CardDeck {
 	 * @param urlQuantityMap
 	 *            urls to be called combined with frequency of calls.
 	 */
-	public CardDeck(Map<String, Integer> urlQuantityMap, int multiplier) {
+	public CardDeck(Map<String, Integer> urlQuantityMap) {
 		List<Integer> lst = new ArrayList<Integer>();
 		for (String url : urlQuantityMap.keySet()) {
 			lst.add(urlQuantityMap.get(url));
@@ -63,10 +63,8 @@ public class CardDeck {
 		int divisor = ggt(lst);
 		for (String url : urlQuantityMap.keySet()) {
 			int number = urlQuantityMap.get(url) / divisor;
-			for (int i = 0; i < number * multiplier; i++) {
-				Card card = new Card(PATH + url);
-				cards.add(card);
-			}
+			Card card = new Card(PATH + url);
+			cards.add(card);
 		}
 		Collections.shuffle(cards);
 	}
