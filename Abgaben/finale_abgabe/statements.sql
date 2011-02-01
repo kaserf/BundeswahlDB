@@ -31,7 +31,7 @@ knappste_verlierer as (SELECT posk.wahlkreis, posk.partei as verlierer_p_nummer,
 SELECT * FROM knappste_verlierer ORDER BY (verlierer_stimmen - sieger_stimmen) DESC;
 
 
---überhangmandate pro partei und bundesland
+--ueberhangmandate pro partei und bundesland
 with
 ergebnis_pro_wk as
 (
@@ -92,7 +92,7 @@ parteien_bundesland_sitze as
 	group by D.Partei,D.Bundesland
 	order by D.Partei
 ),
---Direktmandate berechnen
+--direktmandate berechnen
 direktkandidaten_gewaehlt as
 (
 	select A.Kandidat, A.Wahlkreis
@@ -179,11 +179,6 @@ FROM Kandidat k join Partei p on p.nummer = k.partei
 WHERE ausweisnummer = (SELECT kandidat FROM stimmen_pro_kandidat WHERE anz = (SELECT MAX(anz) FROM stimmen_pro_kandidat));
 
 --stimmenanzahl nach partei
---WITH stimmen_pro_partei (partei_nr, anz_p)
---AS (SELECT zweitstimme, COUNT(*)
---    FROM Wahlzettel
---    WHERE Wahlkreis = 55
---    GROUP BY zweitstimme)
 SELECT p.kurzbezeichnung, (CAST (s.anz_p as float) / foo.anz_ges) * 100 as prozente, anz_p as stimmen
 FROM Partei p, stimmen_pro_partei s, (SELECT COUNT(*) AS anz_ges FROM Wahlzettel WHERE Wahlkreis = 55 AND zweitstimme IS NOT NULL) as foo
 WHERE p.nummer = s.partei_nr
@@ -191,18 +186,3 @@ ORDER BY prozente DESC;
 
 --partei x jahr -> stimmenanzahl
 select w.wahljahr, p.kurzbezeichnung, l.stimmenanzahl from Wahlergebnis w, Listenergebnis l, Partei p where w.id = l.wahlergebnis AND w.wahlkreis = 55 AND l.partei = p.nummer;
-
-
---test
-WITH stimmen_pro_partei (partei_nr, anz_p)
-AS (SELECT zweitstimme, COUNT(*)
-    FROM Wahlzettel
-    WHERE Wahlkreis = 55
-    GROUP BY zweitstimme),
-ergebnis
-AS (SELECT p.kurzbezeichnung, (CAST (s.anz_p as float) / foo.anz_ges) * 100 as prozente, anz_p as stimmen
-FROM Partei p, stimmen_pro_partei s, (SELECT COUNT(*) AS anz_ges FROM Wahlzettel WHERE Wahlkreis = 55 AND zweitstimme IS NOT NULL) as foo
-WHERE p.nummer = s.partei_nr
-ORDER BY prozente DESC)
-
-SELECT SUM(prozente) FROM ergebnis;
